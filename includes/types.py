@@ -5,14 +5,26 @@ import numpy as np
 import copy
 
 
-class Real:
+class Complex:
+
+    def __init__(self, value):
+        self.str = value
+        self.real = 0
+        self.imaginary = 0
+
+    def getType(self):
+        return "complex"
+
+
+
+class Rational:
 
     def __init__(self, value):
         self.value = value
         self.str = str(value)
 
     def getType(self):
-        return("real")
+        return "rational"
 
     def print(self, index):
         u.out((index + " = " if index is not None else "") + self.str)
@@ -26,7 +38,6 @@ class Function:
         self.param = param
 
     def compute(self, param):
-
         try:
             res = eval(self.formated.replace('X', str(param)))
         except ZeroDivisionError:
@@ -57,7 +68,12 @@ class Matrice:
         ret = Matrice()
         new = copy.deepcopy(self.array)
         type = obj.getType()
-        if type == "real":
+
+        if operation == "fn":
+            for i in range(len(new)):
+                for j in range(len(new[i])):
+                    new[i][j] = obj.compute(new[i][j])
+        elif type == "rational":
             var = obj.value
             for i in range(len(new)):
                 for j in range(len(new[i])):
@@ -69,6 +85,8 @@ class Matrice:
                         new[i][j] /= var
                     elif operation == "-":
                         new[i][j] -= var
+                    elif operation == '^':
+                        new[i][j] **= var
                     else:
                         new[i][j] %= var
         elif type == "matrice":
@@ -92,7 +110,7 @@ class Matrice:
         else:
             u.warn("complex or funx ope with matrice", "error")
             return None
-        ret.array = new
+        ret.array = new.copy()
         ret.height = self.height
         ret.width = self.width
         return ret
@@ -117,17 +135,19 @@ class Matrice:
         return self
 
     def print(self, index):
+        output = ""
         if index is not None:
             u.out(index + " = ")
         for m in self.array:
             first = True
-            output = '[ '
+            output += '[ '
             for e in m:
                 if not first:
                     output += ", "
                 output += str(e)
                 first = False
-            u.out(output + ' ]')
+            output += ' ]\n  '
+        u.out(output)
 
     def getType(self):
         return("matrice")

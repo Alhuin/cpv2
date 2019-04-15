@@ -1,11 +1,22 @@
-import sys
 import re
+import tests as t
 from includes import regex
-global data
+
+
+def countUnknownVars(exp):
+    match = re.findall(regex.checkLetter, exp)
+    saved = ""
+    for m in match:
+        if m not in saved:
+            saved += m
+    return len(saved)
 
 
 def out(output):
-    print("  " + str(output))
+    if t.test:
+        t.test_output(output)
+    else:
+        print("  " + str(output))
 
 
 def intFloatCast(exp):
@@ -17,14 +28,12 @@ def intFloatCast(exp):
 
 def warn(message, category):
     if category == "error":
-        print("\033[0;31m[Error]\033[0m " + message)
-
-
-def read_flags():
-    global details
-    nbArgs = len(sys.argv)
-    if nbArgs > 1 and sys.argv[1] == "-d":
-        details = True
+        output = ("\033[31m[Error]\033[0m " + message)
+        if t.test:
+            t.test_output(output)
+        else:
+            print(output)
+    raise Exception
 
 
 def read_in():
@@ -37,13 +46,12 @@ def checkType(str, data):
     if 'i' in str:
         return "complex"
     else:
-        match = re.findall(regex.checkLetter, str)
+        match = re.findall("\W(?!fun[A-Z])([A-Za-z])", str)
         for m in match :
             if m in data.keys():
                 if data[m].getType() == "matrice":
-                    # print("mat")
                     return "matrice"
-        return "real"
+        return "rational"
 
 
 def formatLine(line):
