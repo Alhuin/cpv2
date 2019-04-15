@@ -1,6 +1,21 @@
 import re
 import tests as t
 from includes import regex
+import sys
+
+
+def test():
+    if t.i < len(t.tests):
+        if t.tests[t.i]["input"] == "desc":
+            print("---------------------------------------------\n  " +
+                  t.tests[t.i]["output"]
+                  + "\n---------------------------------------------")
+            t.i += 1
+        t.ret = ("\"" + t.tests[t.i]["input"] + "\"")
+        # print(t.tests[t.i]["input"])
+        return t.tests[t.i]["input"]
+    else:
+        exit()
 
 
 def countUnknownVars(exp):
@@ -38,8 +53,19 @@ def warn(message, category):
 
 def read_in():
     global history
-    user_input = input("> ")
-    return user_input.strip()
+    if t.test:
+        line = test()
+    else:
+        user_input = input("> ")
+        line = user_input.strip()
+    if line == "":
+        warn("Empty input.", "error")
+    elif line == "q" or line == "quit" or line == "exit":
+        sys.exit()
+    return line
+
+
+    return line
 
 
 def checkType(str, data):

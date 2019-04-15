@@ -52,11 +52,24 @@ tests = [
     {"input": "2^v = ?", "output": "\033[31m[Error]\033[0m Can't resolve Rational ^ Matrice."},
     {"input": "5-z=?", "output": "\033[31m[Error]\033[0m Can't resolve Rational - Matrice."},
     {"input": "z%2=?", "output": "[ 1, 0 ]\n  [ 0, 1 ]\n  "},
+    {"input": "z^2=?", "output": "[ 1, 4 ]\n  [ 4, 9 ]\n  "},
+    {"input": "z^v=?", "output": "\033[31m[Error]\033[0m Can't resolve Matrice ^ Matrice."},
 
     {"input": "desc", "output": "Fonctions x Matrices"},
     {"input": "funX(z)=?", "output": "[ 5, 20 ]\n  [ 20, 45 ]\n  "},
     {"input": "a = funX(z) - funX(2)", "output": "[ -15, 0 ]\n  [ 0, 25 ]\n  "},
     {"input": "a = ?", "output": "[ -15, 0 ]\n  [ 0, 25 ]\n  "},
+
+    {"input": "desc", "output": "Assignation et calcul de complexes"},
+    {"input": "c = 5 + 3i", "output": "5 + 3i"},
+    {"input": "c = ?", "output": "5 + 3i"},
+    {"input": "c + 5 = ?", "output": "10 + 3i"},
+    {"input": "a = c + 5", "output": "10 + 3i"},
+    {"input": "a = ?", "output": "10 + 3i"},
+    {"input": "a * 5 = ?", "output": "50 + 15i"},
+    {"input": "b = a * 5 + 8", "output": "58 + 15i"},
+    {"input": "a * b = ?", "output": "535 + 324i"},
+
 ]
 
 category = ""

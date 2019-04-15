@@ -7,14 +7,53 @@ import copy
 
 class Complex:
 
-    def __init__(self, value):
-        self.str = value
+    def __init__(self):
+        self.str = ""
         self.real = 0
         self.imaginary = 0
+        self.imgIsNeg = False
+
+    def parse(self, exp):
+        match = re.search(regex.complex, exp)
+        self.str = exp
+        self.real = u.intFloatCast(match.group(1).replace(" ", ""))
+        self.imaginary = u.intFloatCast(match.group(2).replace(" ", ""))
+        self.imgIsNeg = self.imaginary < 0
+        return self
+
+    def print(self, index):
+        if index is None:
+            u.out(str(self.real) + (" + " if not self.imgIsNeg else "") + str(self.imaginary) + "i")
 
     def getType(self):
         return "complex"
 
+    def calc(self, operation, obj):
+        ret = copy.deepcopy(self)
+        type = obj.getType()
+        # if operation == "fn":
+        if type == "rational":
+            if operation == "+":
+                ret.real += obj.value
+            elif operation == "-":
+                ret.real -= obj.value
+            elif operation == "*":
+                ret.real *= obj.value
+                ret.imaginary *= obj.value
+        elif type == "complex":
+            if operation == "+":
+                ret.real += obj.real
+                ret.imaginary += obj.imaginary
+            elif operation == "-":
+                ret.real -= obj.real
+                ret.imaginary -= obj.imaginary
+            elif operation == "*":
+                old = ret.real
+                ret.real = ret.real * obj.real - ret.imaginary * obj.imaginary
+                ret.imaginary = old * obj.imaginary + ret.imaginary * obj.real
+
+        ret.imgIsNeg = ret.imaginary < 0
+        return ret
 
 
 class Rational:
@@ -72,7 +111,9 @@ class Matrice:
         if operation == "fn":
             for i in range(len(new)):
                 for j in range(len(new[i])):
+                    # print(new[i][j])
                     new[i][j] = obj.compute(new[i][j])
+                    # print(new[i][j])
         elif type == "rational":
             var = obj.value
             for i in range(len(new)):
@@ -85,34 +126,72 @@ class Matrice:
                         new[i][j] /= var
                     elif operation == "-":
                         new[i][j] -= var
-                    elif operation == '^':
+                    elif operation == "^":
                         new[i][j] **= var
                     else:
                         new[i][j] %= var
         elif type == "matrice":
-            if obj.height == self.height and obj.width == self.width:
+            if operation == "^":
+                u.warn("Can't resolve Matrice ^ Matrice????", "error")
+            elif operation == "*" or operation == "/":
+                obj.print(None)
+                print(obj.height)
+                self.print(None)
+                print(self.width)
+                if obj.width == self.height:
+                    # print("main loop")
+                    new = []
+                    i = 0
+                    j = 0
+                    m = 0
+                    while i < obj.height or j < obj.width:
+                        print("main loop")
+                        new.append([])
+                        j = 0
+                        k = 0
+                        while k < self.width:
+                            print('second loop')
+                            j = 0
+                            l = 0
+                            res = 0
+                            while j < obj.width:
+                                print('j = ' + str(j) + ' and self.width = ' + str(self.width))
+                                print("ret += obj["+str(l)+"]["+str(k)+"] * self["+str(i)+"]["+str(j)+"]")
+                                # print("obj[l][k] = " + str(obj[l][k]))
+                                # print("arr[i][j] = " + str(self.array[i][j]))
+                                res += self.array[l][k] * obj.array[i][j]
+                                j += 1
+                                l += 1
+                            print(str(res))
+                            new[m].append(res)
+                            print(new[m])
+                            k += 1
+                        m += 1
+                        i += 1
+                else:
+                    u.warn("Can't resolve m1 * m2 : Number of raws in m1 doesn't match number of columns in m2", "error")
+            else:
                 m = obj.array
                 for i in range(len(new)):
                     for j in range(len(new[i])):
                             if operation == "+":
                                 new[i][j] += m[i][j]
-                            elif operation == "*":
-                                new[i][j] *= m[i][j]
-                            elif operation == "/":
-                                new[i][j] /= m[i][j]
                             elif operation == "-":
                                 new[i][j] -= m[i][j]
                             else:
                                 new[i][j] %= m[i][j]
-            else:
-                u.warn("Impossible d'effectuer un calcul matriciel avec deux matrices de tailles différentes.", "error")
-                return None
+
         else:
-            u.warn("complex or funx ope with matrice", "error")
-            return None
+            u.warn("complex x matrice", "error")
+        print('HUM')
         ret.array = new.copy()
+        print('HUM')
         ret.height = self.height
+        print('HUM')
         ret.width = self.width
+        print('HUM')
+        ret.print(None)
+        print('HUM')
         return ret
 
     def parse(self, exp):
@@ -125,10 +204,12 @@ class Matrice:
             if width is None:
                 width = len(elems)
             elif width != len(elems):
-                return None
+                u.warn("Syntax error", "error")
             for e in elems:
                 matrice[height].append(u.intFloatCast(e))
             height += 1
+        print(height)
+        print(width)
         self.height = height
         self.width = width
         self.array = matrice
