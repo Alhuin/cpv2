@@ -23,7 +23,7 @@ class Complex:
 
     def print(self, index):
         if index is None:
-            u.out(str(self.real) + (" + " if not self.imgIsNeg else "") + str(self.imaginary) + "i")
+            u.out(self.str)
 
     def getType(self):
         return "complex"
@@ -31,7 +31,8 @@ class Complex:
     def calc(self, operation, obj):
         ret = copy.deepcopy(self)
         type = obj.getType()
-        # if operation == "fn":
+        if operation == "fn":
+
         if type == "rational":
             if operation == "+":
                 ret.real += obj.value
@@ -40,6 +41,10 @@ class Complex:
             elif operation == "*":
                 ret.real *= obj.value
                 ret.imaginary *= obj.value
+            elif operation == "%":
+                ret.real %= obj.value
+                ret.imaginary %= obj.value
+
         elif type == "complex":
             if operation == "+":
                 ret.real += obj.real
@@ -52,7 +57,20 @@ class Complex:
                 ret.real = ret.real * obj.real - ret.imaginary * obj.imaginary
                 ret.imaginary = old * obj.imaginary + ret.imaginary * obj.real
 
-        ret.imgIsNeg = ret.imaginary < 0
+        elif type == "matrice":
+            if operation != '*':
+                u.warn("Can't resolve complex " + operation + " matrice", "error")
+            else:
+                ret = copy.deepcopy(obj)
+                for i in range(obj.height):
+                    for j in range(obj.width):
+                        # print(obj.array[i][j])
+                        ret.array[i][j] = self.calc('*', obj.array[i][j])
+                        # print(ret.array[i][j].str)
+
+        if ret.getType() == "complex":
+            ret.imgIsNeg = ret.imaginary < 0
+            ret.str = (str(ret.real) + (" + " if not ret.imgIsNeg else " ") if ret.real != 0 else "") + str(ret.imaginary) + "i"
         return ret
 
 
@@ -68,6 +86,31 @@ class Rational:
     def print(self, index):
         u.out((index + " = " if index is not None else "") + self.str)
 
+    def calc(self, operation, obj):
+        type = obj.getType()
+        if operation == '^':
+            if type == "complex" or type == "matrice":
+                u.warn("Can't resolve rational ^ " + type + ".", "error")
+            return Rational(self.value ** obj.value)
+        elif operation == '-':
+            if type == "matrice":
+                u.warn("Can't substract a matrice to a rational.", "error")
+            return Rational(self.value - obj.value)
+        elif operation == '*':
+            if type == "matrice":
+              # print("test")
+                return(obj.calc('*', self))
+            return Rational(self.value * obj.value)
+        elif operation == '/':
+            return Rational(self.value / obj.value)
+        elif operation == '+':
+            if type == "matrice":
+              # print("test")
+                return(obj.calc('+', self))
+            return Rational(self.value + obj.value)
+        elif operation == '%':
+            return Rational(self.value % obj.value)
+
 
 class Function:
 
@@ -78,9 +121,15 @@ class Function:
 
     def compute(self, param):
         try:
-            res = eval(self.formated.replace('X', str(param)))
+            # print(param.getType())
+            type = param.getType()
+            # print(type)
+            if type == "rational":
+                res = Rational(eval(self.formated.replace('X', param.str)))
+            elif type == "matrice":
+                return param.calc('fn', self.function)
         except ZeroDivisionError:
-            res = u.warn("Division by 0.", "error")
+            u.warn("Division by 0.", "error")
         return res
 
     def draw(self, xMin, xMax):
@@ -111,87 +160,54 @@ class Matrice:
         if operation == "fn":
             for i in range(len(new)):
                 for j in range(len(new[i])):
-                    # print(new[i][j])
                     new[i][j] = obj.compute(new[i][j])
-                    # print(new[i][j])
         elif type == "rational":
             var = obj.value
-            for i in range(len(new)):
-                for j in range(len(new[i])):
-                    if operation == "+":
-                        new[i][j] += var
-                    elif operation == "*":
-                        new[i][j] *= var
-                    elif operation == "/":
-                        new[i][j] /= var
-                    elif operation == "-":
-                        new[i][j] -= var
-                    elif operation == "^":
-                        new[i][j] **= var
-                    else:
-                        new[i][j] %= var
+            if operation == '^':
+                tmp = copy.deepcopy(self)
+                for i in range(obj.value - 1):
+                    tmp = tmp.calc('*', self)
+                new = tmp.array
+            else:
+                for i in range(len(new)):
+                    for j in range(len(new[i])):
+                        new[i][j] = new[i][j].calc(operation, obj)
         elif type == "matrice":
             if operation == "^":
-                u.warn("Can't resolve Matrice ^ Matrice????", "error")
-            elif operation == "*" or operation == "/":
-                obj.print(None)
-                print(obj.height)
-                self.print(None)
-                print(self.width)
-                if obj.width == self.height:
-                    # print("main loop")
+                u.warn("Can't elevate a Matrice to a Matrice.", "error")
+            elif operation == "/":
+                u.warn("Can't devide a Matrice by a Matrice.", "error")
+            elif operation == "*":
+                if self.width == obj.height:
                     new = []
-                    i = 0
-                    j = 0
-                    m = 0
-                    while i < obj.height or j < obj.width:
-                        print("main loop")
+                    i = j = m = 0
+                    while i < self.height or j < self.width:
                         new.append([])
-                        j = 0
-                        k = 0
-                        while k < self.width:
-                            print('second loop')
-                            j = 0
-                            l = 0
+                        j = k = 0
+                        while k < obj.width:
+                            j = l = 0
                             res = 0
-                            while j < obj.width:
-                                print('j = ' + str(j) + ' and self.width = ' + str(self.width))
-                                print("ret += obj["+str(l)+"]["+str(k)+"] * self["+str(i)+"]["+str(j)+"]")
-                                # print("obj[l][k] = " + str(obj[l][k]))
-                                # print("arr[i][j] = " + str(self.array[i][j]))
-                                res += self.array[l][k] * obj.array[i][j]
+                            while j < self.width:
+                                res += obj.array[l][k].calc('*', self.array[i][j]).value
                                 j += 1
                                 l += 1
-                            print(str(res))
-                            new[m].append(res)
-                            print(new[m])
+                            new[m].append(Rational(res))
                             k += 1
                         m += 1
                         i += 1
                 else:
-                    u.warn("Can't resolve m1 * m2 : Number of raws in m1 doesn't match number of columns in m2", "error")
+                    u.warn("Can't resolve m1 * m2 : Number of raws in m1 doesn't match number of columns in m2.", "error")
             else:
                 m = obj.array
                 for i in range(len(new)):
                     for j in range(len(new[i])):
-                            if operation == "+":
-                                new[i][j] += m[i][j]
-                            elif operation == "-":
-                                new[i][j] -= m[i][j]
-                            else:
-                                new[i][j] %= m[i][j]
+                        new[i][j] = new[i][j].calc(operation, m[i][j])
 
         else:
             u.warn("complex x matrice", "error")
-        print('HUM')
         ret.array = new.copy()
-        print('HUM')
         ret.height = self.height
-        print('HUM')
         ret.width = self.width
-        print('HUM')
-        ret.print(None)
-        print('HUM')
         return ret
 
     def parse(self, exp):
@@ -204,12 +220,10 @@ class Matrice:
             if width is None:
                 width = len(elems)
             elif width != len(elems):
-                u.warn("Syntax error", "error")
+                u.warn("Syntax : Matrice not well formated.", "error")
             for e in elems:
-                matrice[height].append(u.intFloatCast(e))
+                matrice[height].append(Rational(u.intFloatCast(e)))
             height += 1
-        print(height)
-        print(width)
         self.height = height
         self.width = width
         self.array = matrice
@@ -225,7 +239,7 @@ class Matrice:
             for e in m:
                 if not first:
                     output += ", "
-                output += str(e)
+                output += e.str
                 first = False
             output += ' ]\n  '
         u.out(output)

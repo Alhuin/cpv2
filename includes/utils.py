@@ -12,7 +12,6 @@ def test():
                   + "\n---------------------------------------------")
             t.i += 1
         t.ret = ("\"" + t.tests[t.i]["input"] + "\"")
-        # print(t.tests[t.i]["input"])
         return t.tests[t.i]["input"]
     else:
         exit()
@@ -62,9 +61,6 @@ def read_in():
         warn("Empty input.", "error")
     elif line == "q" or line == "quit" or line == "exit":
         sys.exit()
-    return line
-
-
     return line
 
 
