@@ -47,16 +47,39 @@ tests = [
     {"input": "z * 2 = ?", "output": "[ 2, 4 ]\n  [ 4, 6 ]\n  "},
     {"input": "v = [[5,12];[50,23]]", "output": "[ 5, 12 ]\n  [ 50, 23 ]\n  "},
     {"input": "v - z + 5 * 2 + v = ?", "output": "[ 19, 32 ]\n  [ 108, 53 ]\n  "},
-    {"input": "v * z = ?", "output": "[ 5, 24 ]\n  [ 100, 69 ]\n  "},
-    {"input": "v^2 = ?", "output": "[ 25, 144 ]\n  [ 2500, 529 ]\n  "},
-    {"input": "2^v = ?", "output": "\033[31m[Error]\033[0m Can't resolve Rational ^ Matrice."},
-    {"input": "5-z=?", "output": "\033[31m[Error]\033[0m Can't resolve Rational - Matrice."},
+    {"input": "v * z = ?", "output": "[ 29, 46 ]\n  [ 96, 169 ]\n  "},
+    {"input": "v^2 = ?", "output": "[ 625, 336 ]\n  [ 1400, 1129 ]\n  "},
+    {"input": "2^v = ?", "output": "\033[31m[Error]\033[0m Can't resolve rational ^ matrice."},
+    {"input": "5-z=?", "output": "\033[31m[Error]\033[0m Can't substract a matrice to a rational."},
     {"input": "z%2=?", "output": "[ 1, 0 ]\n  [ 0, 1 ]\n  "},
+    {"input": "z^3=?", "output": "[ 21, 34 ]\n  [ 34, 55 ]\n  "},
+    {"input": "z^v=?", "output": "\033[31m[Error]\033[0m Can't elevate a Matrice to a Matrice."},
+    {"input": "z/v=?", "output": "\033[31m[Error]\033[0m Can't devide a Matrice by a Matrice."},
+    {"input": "z/2=?", "output": "[ 0.5, 1.0 ]\n  [ 1.0, 1.5 ]\n  "},
+    {"input": " a = [[5];[2]]", "output": "[ 5 ]\n  [ 2 ]\n  "},
+    {"input": " a * z = ?", "output": "\033[31m[Error]\033[0m Can't resolve m1 * m2 : Number of raws in m1 doesn't match number of columns in m2."},
+    {"input": " a = [[5,2]]", "output": "[ 5, 2 ]\n  "},
+    {"input": " a * z = ?", "output": "[ 9, 16 ]\n  "},
+
+    {"input": "desc", "output": "Assignation et calcul de complexes"},
+    {"input": "c = 5 + 3i", "output": "5 + 3i"},
+    {"input": "c = ?", "output": "5 + 3i"},
+    {"input": "c + 5 = ?", "output": "10 + 3i"},
+    {"input": "a = c + 5", "output": "10 + 3i"},
+    {"input": "a = ?", "output": "10 + 3i"},
+    {"input": "a * 5 = ?", "output": "50 + 15i"},
+    {"input": "b = a * 5 + 8", "output": "58 + 15i"},
+    {"input": "a * b = ?", "output": "535 + 324i"},
+
+    {"input": "desc", "output": "Complex x Matrices"},
+    {"input": " a * z = ?", "output": "[ 10 + 3i, 20 + 6i ]\n  [ 20 + 6i, 30 + 9i ]\n  "},
+    {"input": "funX(c) = ?", "output": "80 + 150i\n  "},
 
     {"input": "desc", "output": "Fonctions x Matrices"},
     {"input": "funX(z)=?", "output": "[ 5, 20 ]\n  [ 20, 45 ]\n  "},
     {"input": "a = funX(z) - funX(2)", "output": "[ -15, 0 ]\n  [ 0, 25 ]\n  "},
     {"input": "a = ?", "output": "[ -15, 0 ]\n  [ 0, 25 ]\n  "},
+
 ]
 
 category = ""
