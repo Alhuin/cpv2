@@ -57,9 +57,7 @@ def read_in():
     else:
         user_input = input("> ")
         line = user_input.strip()
-    if line == "":
-        warn("Empty input.", "error")
-    elif line == "q" or line == "quit" or line == "exit":
+    if line == "q" or line == "quit" or line == "exit":
         sys.exit()
     return line
 

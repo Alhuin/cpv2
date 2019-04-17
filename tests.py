@@ -6,6 +6,7 @@ tests = [
 
     {"input": "desc", "output": "Bad syntax"},
     {"input": "x == 5", "output": "\033[31m[Error]\033[0m Syntax error."},
+    {"input": "x = g", "output": "\033[31m[Error]\033[0m The variable g is not assigned."},
     {"input": "x = 5 = ?", "output": "\033[31m[Error]\033[0m Syntax error."},
     {"input": "x = 3 + 5 ?", "output": "\033[31m[Error]\033[0m Syntax error."},
     {"input": "x + 8 = 5", "output": "\033[31m[Error]\033[0m Syntax error."},
@@ -13,6 +14,7 @@ tests = [
     {"input": "x = 5", "output": "5"},
     {"input": "x / 0 = ?", "output": "\033[31m[Error]\033[0m Division by 0."},
     {"input": "x / 0 ?", "output": "\033[31m[Error]\033[0m Syntax error."},
+    {"input": "i = 8", "output": "\033[31m[Error]\033[0m Can't assign the variable i."},
 
     {"input": "desc", "output": "Assignation et calculs de réels"},
     {"input": "x = 5", "output": "5"},
@@ -29,15 +31,15 @@ tests = [
     {"input": "2 * 5^2 = ?", "output": "50"},
 
     {"input": "desc", "output": "Assignation et calculs de fonctions"},
-    {"input": "funX(x) = 5x^2", "output": "5x^2"},
-    {"input": "funX = ?", "output": "5x^2"},
+    {"input": "funX(p) = 5p^2", "output": "5p^2"},
+    {"input": "funX = ?", "output": "5p^2"},
     {"input": "funX(2) = ?", "output": "20"},
     {"input": "funX(x) = ?", "output": "-16.2"},
     {"input": "funX(x + 2) = ?", "output": "0.2"},
     {"input": "funX(x) + y = ?", "output": "-4.2"},
-    {"input": "funY(y)= y + 6", "output": "y + 6"},
+    {"input": "funY(b)= b + 6", "output": "b + 6"},
     {"input": "funX(2) + funY(5) = ?", "output": "31"},
-    {"input": "funA(z) = z + w", "output": "\033[31m[Error]\033[0m Too many unknown variables."},
+    {"input": "funA(q) = q + w", "output": "\033[31m[Error]\033[0m Too many unknown variables."},
     {"input": "z = funX(x) + 7 - funY(3)", "output": "-18.2"},
     {"input": "z*2 = ?", "output": "-36.4"},
     {"input": "funX(3) = ?", "output": "45"},
@@ -64,6 +66,7 @@ tests = [
 
     {"input": "desc", "output": "Assignation et calcul de complexes"},
     {"input": "c = 5 + 3i", "output": "5 + 3i"},
+    {"input": "y = -4i", "output": "-4i"},
     {"input": "c = ?", "output": "5 + 3i"},
     {"input": "c + 5 = ?", "output": "10 + 3i"},
     {"input": "a = c + 5", "output": "10 + 3i"},
@@ -82,7 +85,7 @@ tests = [
 
     {"input": "desc", "output": "Fonctions x Complexes"},
     {"input": "funX(c) = ?", "output": "80 + 150i"},
-    {"input": "funA(x) = 5+6-8x^2", "output": "5+6-8x^2"},
+    {"input": "funA(s) = 5+6-8s^2", "output": "5+6-8s^2"},
     {"input": "d = 5+3i", "output": "5+3i"},
     {"input": "funA(d) = ?", "output": "-117 -240i"},
 

@@ -1,14 +1,14 @@
 import re
 
-get = re.compile("^(.*)\s*\=\s*\?\s*$", flags=re.IGNORECASE)
+get = re.compile("^(.*)\s*=\s*\?\s*$", flags=re.IGNORECASE)
 
-put = re.compile("^\s*([A-Z]+|fun[A-Z]\([A-Z]\))\s*\=(.*)", flags=re.IGNORECASE)
+put = re.compile("^\s*([A-Z]+|fun[A-Z]\([A-Z]\))\s*=(.*)", flags=re.IGNORECASE)
 
-complex = re.compile("^\s*(\d+)\s*([\+\-]\s*\d+)\s*\*?\s*i\s*", flags=re.IGNORECASE)
+complex = re.compile("^\s*(?:(\d+)\s*)?([+\-]?\s*\d+)\s*\*?\s*i\s*", flags=re.IGNORECASE)
 
 func = re.compile("(fun[a-z])\((\d+|[a-z]+)\)", flags=re.IGNORECASE)
 
-evalFunc = re.compile("(fun[a-z])\(((?:[a-z]|[\d\s+\-\*\/\%])+)\)", flags=re.IGNORECASE)
+evalFunc = re.compile("(fun[a-z])\(((?:[a-z]|[\d\s+\-*/%])+)\)", flags=re.IGNORECASE)
 
 draw = re.compile("draw\s*(fun[A-Z])", flags=re.IGNORECASE)
 
