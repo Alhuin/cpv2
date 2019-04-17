@@ -32,11 +32,13 @@ def evalMatriceComplex(exp):
                 func = data[key[0:4]]
                 if fn.group(2).strip() in data.keys():
                     param = data[fn.group(2).strip()]
+                    print(param.getType())
                     if param.getType() == "matrice":
                         datas["mat" + str(i)] = param.calc("fn", func)
                         exp = exp.replace(key, "mat" + str(i), 1)
                         i += 1
                     elif param.getType() == "complex":
+                        print("ok")
                         datas["com" + str(j)] = param.calc("fn", func)
                         exp = exp.replace(key, "com" + str(j), 1)
                         j += 1
@@ -92,6 +94,9 @@ def evalMatriceComplex(exp):
             if nb1.isnumeric() and nb2.isnumeric():
                 exp = exp.replace(string, str(eval(string)), 1)
             else:
+                print(nb1)
+                print(ope)
+                print(nb2)
                 if nb1 in datas.keys() and nb2 in datas.keys():
                     var1 = datas[nb1]
                     var2 = datas[nb2]
@@ -112,14 +117,19 @@ def evalMatriceComplex(exp):
                             i += 1
                         datas[key] = Rational(u.intFloatCast(nb1)).calc(ope, var)
                 else:
+                    print("wtf")
                     if nb1 in datas.keys():
+                        print("wtf")
                         var = datas[nb1]
                         if var.getType() == "complex":
+                            print("wtf")
                             key = "com" + str(j)
                             j += 1
                         else:
                             key = "mat" + str(i)
                             i += 1
+                            print("mat0 + 5")
+                        print("wtf")
                         datas[key] = var.calc(ope, Rational(u.intFloatCast(nb2)))
                 exp = exp.replace(string, key, 1)
                 i += 1
@@ -193,7 +203,7 @@ def evaluate(exp):
     exp = evalRationals(exp)                    # replace X || y by their result
     types = unknownTypes(exp)
     if types is not None:
-       # print("goEval")
+        # print("goEval")
         return evalMatriceComplex(exp)
        # print("stopEval")
     else:

@@ -40,6 +40,7 @@ tests = [
     {"input": "funA(z) = z + w", "output": "\033[31m[Error]\033[0m Too many unknown variables."},
     {"input": "z = funX(x) + 7 - funY(3)", "output": "-18.2"},
     {"input": "z*2 = ?", "output": "-36.4"},
+    {"input": "funX(3) = ?", "output": "45"},
 
     {"input": "desc", "output": "Assignation et calculs de matrices"},
     {"input": "z = [[1,2];[2,3]]", "output": "[ 1, 2 ]\n  [ 2, 3 ]\n  "},
@@ -49,12 +50,12 @@ tests = [
     {"input": "v - z + 5 * 2 + v = ?", "output": "[ 19, 32 ]\n  [ 108, 53 ]\n  "},
     {"input": "v * z = ?", "output": "[ 29, 46 ]\n  [ 96, 169 ]\n  "},
     {"input": "v^2 = ?", "output": "[ 625, 336 ]\n  [ 1400, 1129 ]\n  "},
-    {"input": "2^v = ?", "output": "\033[31m[Error]\033[0m Can't resolve rational ^ matrice."},
+    {"input": "2^v = ?", "output": "\033[31m[Error]\033[0m Can't elevate a rational to a matrice."},
     {"input": "5-z=?", "output": "\033[31m[Error]\033[0m Can't substract a matrice to a rational."},
     {"input": "z%2=?", "output": "[ 1, 0 ]\n  [ 0, 1 ]\n  "},
     {"input": "z^3=?", "output": "[ 21, 34 ]\n  [ 34, 55 ]\n  "},
-    {"input": "z^v=?", "output": "\033[31m[Error]\033[0m Can't elevate a Matrice to a Matrice."},
-    {"input": "z/v=?", "output": "\033[31m[Error]\033[0m Can't devide a Matrice by a Matrice."},
+    {"input": "z^v=?", "output": "\033[31m[Error]\033[0m Can't elevate a matrice to a matrice."},
+    {"input": "z/v=?", "output": "\033[31m[Error]\033[0m Can't divide a matrice by a matrice."},
     {"input": "z/2=?", "output": "[ 0.5, 1.0 ]\n  [ 1.0, 1.5 ]\n  "},
     {"input": " a = [[5];[2]]", "output": "[ 5 ]\n  [ 2 ]\n  "},
     {"input": " a * z = ?", "output": "\033[31m[Error]\033[0m Can't resolve m1 * m2 : Number of raws in m1 doesn't match number of columns in m2."},
@@ -73,12 +74,17 @@ tests = [
 
     {"input": "desc", "output": "Complex x Matrices"},
     {"input": " a * z = ?", "output": "[ 10 + 3i, 20 + 6i ]\n  [ 20 + 6i, 30 + 9i ]\n  "},
-    {"input": "funX(c) = ?", "output": "80 + 150i\n  "},
 
     {"input": "desc", "output": "Fonctions x Matrices"},
     {"input": "funX(z)=?", "output": "[ 5, 20 ]\n  [ 20, 45 ]\n  "},
     {"input": "a = funX(z) - funX(2)", "output": "[ -15, 0 ]\n  [ 0, 25 ]\n  "},
     {"input": "a = ?", "output": "[ -15, 0 ]\n  [ 0, 25 ]\n  "},
+
+    {"input": "desc", "output": "Fonctions x Complexes"},
+    {"input": "funX(c) = ?", "output": "80 + 150i"},
+    {"input": "funA(x) = 5+6-8x^2", "output": "5+6-8x^2"},
+    {"input": "d = 5+3i", "output": "5+3i"},
+    {"input": "funA(d) = ?", "output": "-117 -240i"},
 
 ]
 

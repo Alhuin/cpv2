@@ -78,8 +78,10 @@ def checkType(str, data):
 
 def formatLine(line):
     line = re.sub(regex.checkLetter, "X", line)
-    line = re.sub("([\+\-=]|^)\s*(\d+(?:\.\d+)?)\s*\*?\s*[A-Z]\s*\^\s*(\d+)\s*(?=[\+\-\%\*=]|$)", r"\1 \2 * X^\3 ", line, flags=re.IGNORECASE)
-    line = re.sub("(\d+(?:\.\d+)?)\s*\*?\s*[A-Z]\s*([\+\%\*\-=]|$)", r"\1 * X \2", line, flags=re.IGNORECASE)
+    line = re.sub("([\-+*%/=])\s*(\d)", r"\1 \2", line, flags=re.IGNORECASE)
+    line = re.sub("(\d)\s*([\-+*%/=])", r"\1 \2", line, flags=re.IGNORECASE)
+    line = re.sub("([+-=]|^)\s*(\d+(?:\.\d+)?)\s*\*?\s*[A-Z]\s*\^\s*(\d+)\s*(?=[+\-%*=]|$)", r"\1 \2 * X^\3 ", line, flags=re.IGNORECASE)
+    line = re.sub("(\d+(?:\.\d+)?)\s*\*?\s*[A-Z]\s*([+%*\-=]|$)", r"\1 * X \2", line, flags=re.IGNORECASE)
     line = re.sub("\^", "**", line)
 
     return line
