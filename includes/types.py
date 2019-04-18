@@ -279,6 +279,8 @@ class Complex:
     def parse(self, exp):
         match = re.search(regex.complex, exp)
         self.str = exp
+        print(match.group(1))
+        print(match.group(2))
         self.real = 0 if match.group(1) is None else u.intFloatCast(match.group(1).replace(" ", ""))
         self.imaginary = u.intFloatCast(match.group(2).replace(" ", ""))
         self.imgIsNeg = self.imaginary < 0
@@ -402,10 +404,6 @@ class Complex:
                     for j in range(obj.width):
                         ret.array[i][j] = self.calc('+', obj.array[i][j])
 
-            elif type == "function":
-                u.warn("complexe + fonctions a gerer", "todo")
-                # TODO checker si les fonctions sont bien évaluées
-
         elif operation == "-":
             if type == "rational":
                 ret.real -= obj.value
@@ -421,10 +419,6 @@ class Complex:
                     for j in range(obj.width):
                         ret.array[i][j] = self.calc('-', obj.array[i][j])
 
-            elif type == "function":
-                # TODO checker si les fonctions sont bien évaluées
-                u.warn("complexe - fonctions a gerer", "todo")
-
         elif operation == "*":
             if type == "rational":
                 ret.real *= obj.value
@@ -435,16 +429,14 @@ class Complex:
                 old = ret.real
                 ret.real = ret.real * obj.real - ret.imaginary * obj.imaginary
                 ret.imaginary = old * obj.imaginary + ret.imaginary * obj.real
+                print(ret.real)
+                print(ret.imaginary)
 
             elif type == "matrice":
                 ret = copy.deepcopy(obj)
                 for i in range(obj.height):
                     for j in range(obj.width):
                         ret.array[i][j] = self.calc('*', obj.array[i][j])
-
-            elif type == "function":
-                u.warn("complexe * fonctions a gerer", "todo")
-                # TODO checker si les fonctions sont bien évaluées
 
         elif operation == "/":
             if type == "rational":
@@ -455,9 +447,6 @@ class Complex:
             elif type == "complex":
                 # TODO checker complexe / complexe
                 u.warn("Can't devide a complex by a complex.", "todo")
-                # old = ret.real
-                # ret.real = ret.real * obj.real - ret.imaginary * obj.imaginary
-                # ret.imaginary = old * obj.imaginary + ret.imaginary * obj.real
 
             elif type == "matrice":
                 ret = copy.deepcopy(obj)
@@ -478,9 +467,6 @@ class Complex:
             elif type == "complex":
                 # TODO checker complexe % complexe
                 u.warn("Can't modulo a complex by a complex.", "todo")
-                # old = ret.real
-                # ret.real = ret.real * obj.real - ret.imaginary * obj.imaginary
-                # ret.imaginary = old * obj.imaginary + ret.imaginary * obj.real
 
             elif type == "matrice":
                 ret = copy.deepcopy(obj)
@@ -493,12 +479,16 @@ class Complex:
                 u.warn("complexe * fonctions a gerer", "todo")
 
         elif operation == '^':
+            print("in")
             if type != "rational":
                 u.warn("Can't elevate a complex to a " + type + ".", "error")
+            print(ret.real)
+            print(ret.imaginary)
             for i in range(obj.value):
                 ret *= self.calc('*', self)
-
         if ret.getType() == "complex":
             ret.imgIsNeg = ret.imaginary < 0
-            ret.str = (str(ret.real) + (" + " if not ret.imgIsNeg else " ") if ret.real != 0 else "") + str(ret.imaginary) + "i"
+            ret.str = (str(ret.real) + (" + " if not ret.imgIsNeg and ret.imaginary != 0 else " ") if ret.real != 0 else "") + ((str(ret.imaginary) + "i") if ret.imaginary != 0 else "")
+        ret.print(None)
+        print(ret.str)
         return ret

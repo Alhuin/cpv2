@@ -55,7 +55,7 @@ def evalMatriceComplex(exp):
                         tmp["com" + str(j)] = param.calc("fn", func)
                         exp = exp.replace(key, "com" + str(j), 1)
                         j += 1
-    # print(exp)
+    print(exp)
     match = True
     while match:
         match = re.search("(\d+|mat\d+|com\d+)\s*([\*\/\%\^])\s*(\d+|mat\d+|com\d+)", exp)
@@ -242,7 +242,7 @@ def countUnknownVars(exp):
         key = m.strip()
         if key in data.keys():
             exp = exp.replace(key, data[key].str)
-        else:
+        elif m != "i":
             count += 1
     if count > 1:
         return None
