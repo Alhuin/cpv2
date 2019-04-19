@@ -11,15 +11,16 @@ def evalMatriceComplex(exp):
     j = 0
     match = True
     tmp = {}
-
+    print(exp)
+    match = True
     while match:
-        match = re.search(regex.checkMatrice, exp)
+        match = re.search(regex.complex, exp)
         if match:
-            m = Matrice()
+            c = Complex()
             string = match.group(0)
-            key = "mat" + str(i)
-            i += 1
-            tmp[key] = m.parse(string)
+            key = "com" + str(j)
+            j += 1
+            tmp[key] = c.parse(string)
             exp = exp.replace(string, key)
 
     match = True
@@ -55,7 +56,7 @@ def evalMatriceComplex(exp):
                         tmp["com" + str(j)] = param.calc("fn", func)
                         exp = exp.replace(key, "com" + str(j), 1)
                         j += 1
-    print(exp)
+    # print(exp)
     match = True
     while match:
         match = re.search("(\d+|mat\d+|com\d+)\s*([\*\/\%\^])\s*(\d+|mat\d+|com\d+)", exp)
@@ -142,11 +143,11 @@ def evalMatriceComplex(exp):
                         else:
                             key = "mat" + str(i)
                             i += 1
-                            # print("mat0 + 5")
-                        # print("wtf")
                         tmp[key] = var.calc(ope, Rational(u.intFloatCast(nb2)))
                 exp = exp.replace(string, key, 1)
+                print(exp)
                 i += 1
+    print(exp)
     if exp.strip() in tmp.keys():
         return tmp[exp.strip()]
     else:
@@ -155,26 +156,27 @@ def evalMatriceComplex(exp):
 
 def evalFunction(exp):
     match = re.findall(regex.evalFunc, exp)
-
+    # print(exp)
     if match:
+        print(match)
         for m in match:
             fun = m[0]
             param = m[1]
-
             if fun in data.keys():
                 fn = data[fun]
                 if param.isnumeric():
-                    exp = re.sub(fun + "\(" + param + "\)", str(fn.compute(Rational(param)).value), exp)
+                    # print(exp)
+                    exp = re.sub(fun + "\(" + param + "\)", fn.compute(Rational(param)).str, exp)
                 elif param in data.keys():
                     type = data[param].getType()
                     if type == "rational":
-                        exp = re.sub(fun + "\(" + param + "\)", str(fn.compute(data[param]).value), exp)
+                        exp = re.sub(fun + "\(" + param + "\)", fn.compute(data[param]).str, exp)
                     elif type == "matrice" or type == "complex":
                         continue
                 else:
                     obj = evaluate(param)
                     if obj.getType() == "rational":
-                        exp = exp.replace(fun + "(" + param + ")", str(round(fn.compute(obj).value, 2)))
+                        exp = exp.replace(fun + "(" + param + ")", fn.compute(obj).value)
                     else:
                         u.warn("The variable " + param + " is not assigned.", "error")
             else:
@@ -212,12 +214,16 @@ def unknownTypes(exp):
 
 def evaluate(exp):
     exp = evalFunction(exp)                 # replace funX(y) || funX(5) by their result
+    # print(exp)
+    # print(exp)
     exp = evalRationals(exp)               # replace X || y by their result
+    print(exp)
+    # print("exp =" + exp)
     types = unknownTypes(exp)
     # print(exp)
     # print(re.match(regex.checkMatrice, exp))
-    if types is not None or re.search(regex.checkMatrice, exp):
-        # print("goEval")
+    if types is not None or re.search(regex.checkMatrice, exp) or "i" in exp:
+        print("goEval")
         # print(exp)
         return evalMatriceComplex(exp)
        # print("stopEval")
@@ -233,33 +239,39 @@ def evaluate(exp):
             u.warn("Syntax error.", "error")
 
 
-def countUnknownVars(exp):
-    match = True
+def countUnknownVars(exp, param):
     count = 0
+    buff = ""
 
     match = re.findall(regex.checkLetter, exp)
     for m in match:
         key = m.strip()
-        if key in data.keys():
+        if key not in data.keys():
+            if key != "i" and m not in buff:
+                buff += m
+                count += 1
+        elif param != key:
             exp = exp.replace(key, data[key].str)
-        elif m != "i":
-            count += 1
-    if count > 1:
-        return None
-    else:
+    if count < 2:
         return exp
+    else:
+        return None
 
 def parsePut(key, exp):
+    # print("in put")
     value = ""
     if exp in data.keys():                                            # x = y     => assign x
         value = data[exp]
     else:
         match = re.match(regex.func, key)
         if match:
-            exp = countUnknownVars(exp)
+            exp = countUnknownVars(exp, match.group(2).strip())
             if exp is not None:
+                # print(value)
+                # print(exp)
                 value = Function(exp, match.group(2))
                 key = match.group(1)[0:4]
+                # print("wtf")
             else:
                 u.warn("Too many unknown variables.", "error")
         else:
@@ -276,17 +288,16 @@ def parsePut(key, exp):
 
 
 def parseGet(key):
+    # print(key)
     if key in data.keys():                                                                      # "x = ?"
         data[key].print(None)
     elif re.search(regex.checkLetter, key):
-       # print("eval")
         res = evaluate(key)
-        # print(res.getType())
         res.print(None)
-    else:                                                  # "5 + 5 = ?"
+    else:                              # "5 + 5 = ?"
         try:
             res = eval(u.formatLine(key))
-            u.out(res)
+            Rational(res).print(None)
         except ZeroDivisionError:
             u.warn("Division by 0.", "error")
         except SyntaxError:
@@ -300,7 +311,6 @@ def compute(line):
         key = get.group(1).strip()
         if key == "" or '=' in key:
             u.warn("Syntax error.", "error")
-       # print("get")
         parseGet(key)
     elif put:
         exp = put.group(2).strip()
@@ -327,8 +337,12 @@ def main():
                 print("\033[31m[Error]\033[0m Empty input.")
                 continue
             elif line == "env":
+                t.i += 1
+                print("\n   ENV")
                 for index, var in enumerate(data):
-                    var.print(index)
+                    data[var].print(var)
+                print('\n')
+                continue
             else:
                 try:
                    # print(line)

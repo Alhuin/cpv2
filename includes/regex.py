@@ -4,7 +4,7 @@ get = re.compile("^(.*)\s*=\s*\?\s*$", flags=re.IGNORECASE)
 
 put = re.compile("^\s*([A-Z]+|fun[A-Z]\([A-Z]\))\s*=(.*)", flags=re.IGNORECASE)
 
-complex = re.compile("^\s*(?:(\d+)\s*)?([+\-]?\s*\d+)\s*\*?\s*i\s*", flags=re.IGNORECASE)
+complex = re.compile("\s*(?:(\d+)\s*)?([+\-]?\s*\d+)\s*\*?\s*i\s*", flags=re.IGNORECASE)
 
 func = re.compile("(fun[a-z])\((\d+|[a-z]+)\)", flags=re.IGNORECASE)
 
@@ -16,7 +16,7 @@ checkMatrice = re.compile("(\[\[\d+(?:\.\d+)?(?:,\d+(?:\.\d+)?)*\](?:;\[\d+(?:\.
 
 parseMatrice = re.compile("\[(\d+(?:\.\d+)?(?:,\d+(?:\.\d+)?)*)\]", flags=re.IGNORECASE)
 
-checkLetter = re.compile("([A-Z])", flags=re.IGNORECASE)
+checkLetter = re.compile("([A-HJ-Z])", flags=re.IGNORECASE)
 
 
 

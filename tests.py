@@ -15,6 +15,7 @@ tests = [
     {"input": "x / 0 = ?", "output": "\033[31m[Error]\033[0m Division by 0."},
     {"input": "x / 0 ?", "output": "\033[31m[Error]\033[0m Syntax error."},
     {"input": "i = 8", "output": "\033[31m[Error]\033[0m Can't assign the variable i."},
+    {"input": "env", "output": ""},
 
     {"input": "desc", "output": "Assignation et calculs de réels"},
     {"input": "x = 5", "output": "5"},
@@ -29,12 +30,15 @@ tests = [
     {"input": "8 + 2 = ?", "output": "10"},
     {"input": "4^2 = ?", "output": "16"},
     {"input": "2 * 5^2 = ?", "output": "50"},
+    {"input": "env", "output": ""},
 
     {"input": "desc", "output": "Assignation et calculs de fonctions"},
-    {"input": "funX(p) = 5p^2", "output": "5p^2"},
-    {"input": "funX = ?", "output": "5p^2"},
+    {"input": "funX(x) = 5x^2", "output": "5x^2"},
+    {"input": "funX = ?", "output": "5x^2"},
     {"input": "funX(2) = ?", "output": "20"},
-    {"input": "funX(x) = ?", "output": "-16.2"},
+    {"input": "x = -3", "output": "-3"},
+    {"input": "funX(x) = ?", "output": "45"},
+    {"input": "x = -1.8", "output": "-1.8"},
     {"input": "funX(x + 2) = ?", "output": "0.2"},
     {"input": "funX(x) + y = ?", "output": "-4.2"},
     {"input": "funY(b)= b + 6", "output": "b + 6"},
@@ -43,13 +47,14 @@ tests = [
     {"input": "z = funX(x) + 7 - funY(3)", "output": "-18.2"},
     {"input": "z*2 = ?", "output": "-36.4"},
     {"input": "funX(3) = ?", "output": "45"},
+    {"input": "env", "output": ""},
 
     {"input": "desc", "output": "Assignation et calculs de matrices"},
     {"input": "z = [[1,2];[2,3]]", "output": "[ 1, 2 ]\n  [ 2, 3 ]\n  "},
     {"input": "z = ?", "output": "[ 1, 2 ]\n  [ 2, 3 ]\n  "},
     {"input": "z * 2 = ?", "output": "[ 2, 4 ]\n  [ 4, 6 ]\n  "},
     {"input": "v = [[5,12];[50,23]]", "output": "[ 5, 12 ]\n  [ 50, 23 ]\n  "},
-    {"input": "v - z + 5 * 2 + v = ?", "output": "[ 19, 32 ]\n  [ 108, 53 ]\n  "},
+    {"input": "v - z + 5 * 2 + v = ?", "output": "\033[31m[Error]\033[0m Can't add a rational to a matrice."},
     {"input": "v * z = ?", "output": "[ 29, 46 ]\n  [ 96, 169 ]\n  "},
     {"input": "v^2 = ?", "output": "[ 625, 336 ]\n  [ 1400, 1129 ]\n  "},
     {"input": "2^v = ?", "output": "\033[31m[Error]\033[0m Can't elevate a rational to a matrice."},
@@ -63,6 +68,7 @@ tests = [
     {"input": " a * z = ?", "output": "\033[31m[Error]\033[0m Can't resolve m1 * m2 : Number of raws in m1 doesn't match number of columns in m2."},
     {"input": " a = [[5,2]]", "output": "[ 5, 2 ]\n  "},
     {"input": " a * z = ?", "output": "[ 9, 16 ]\n  "},
+    {"input": "env", "output": ""},
 
     {"input": "desc", "output": "Assignation et calcul de complexes"},
     {"input": "c = 5 + 3i", "output": "5 + 3i"},
@@ -74,20 +80,28 @@ tests = [
     {"input": "a * 5 = ?", "output": "50 + 15i"},
     {"input": "b = a * 5 + 8", "output": "58 + 15i"},
     {"input": "a * b = ?", "output": "535 + 324i"},
+    {"input": "a * b = ?", "output": "535 + 324i"},
+    {"input": "a = 20 - 4i", "output": "20 -4i"},
+    {"input": "b = 3 + 2i", "output": "3 + 2i"},
+    {"input": "a / b = ?", "output": "4 -4i"},
+
+    {"input": "env", "output": ""},
 
     {"input": "desc", "output": "Complex x Matrices"},
-    {"input": " a * z = ?", "output": "[ 10 + 3i, 20 + 6i ]\n  [ 20 + 6i, 30 + 9i ]\n  "},
+    {"input": " a * z = ?", "output": "[ 20 -4i, 40 -8i ]\n  [ 40 -8i, 60 -12i ]\n  "},
 
     {"input": "desc", "output": "Fonctions x Matrices"},
     {"input": "funX(z)=?", "output": "[ 5, 20 ]\n  [ 20, 45 ]\n  "},
     {"input": "a = funX(z) - funX(2)", "output": "[ -15, 0 ]\n  [ 0, 25 ]\n  "},
     {"input": "a = ?", "output": "[ -15, 0 ]\n  [ 0, 25 ]\n  "},
+    {"input": "env", "output": ""},
 
     {"input": "desc", "output": "Fonctions x Complexes"},
     {"input": "funX(c) = ?", "output": "80 + 150i"},
     {"input": "funA(s) = 5+6-8s^2", "output": "5+6-8s^2"},
-    {"input": "d = 5+3i", "output": "5+3i"},
+    {"input": "d = 5+3i", "output": "5 + 3i"},
     {"input": "funA(d) = ?", "output": "-117 -240i"},
+    {"input": "env", "output": ""},
 
 ]
 

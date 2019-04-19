@@ -13,7 +13,10 @@ class Function:
         self.param = param
 
     def print(self, index):
-        u.out((index + " = " if index is not None else "") + self.function)
+        if index is None:
+            u.out(self.function)
+        else:
+            print("  " + index + " = " + self.function)
 
     def getType(self):
         return "function"
@@ -24,18 +27,6 @@ class Function:
         plt.plot(X, y)
         plt.show()
 
-    def compute(self, param):
-        try:
-            type = param.getType()
-
-            if type == "rational":
-                return Rational(eval(self.formated.replace('X', param.str)))
-
-            elif type == "matrice" or type == "complex":
-                return param.calc('fn', self)
-
-        except ZeroDivisionError:
-            u.warn("Division by 0.", "error")
 
 
 class Rational:
@@ -45,7 +36,10 @@ class Rational:
         self.str = str(value)
 
     def print(self, index):
-        u.out((index + " = " if index is not None else "") + self.str)
+        if index is None:
+            u.out((index + " = " if index is not None else "") + self.str)
+        else:
+            print("  " + (index + " = " if index is not None else "") + self.str)
 
     def getType(self):
         return "rational"
@@ -100,7 +94,6 @@ class Rational:
             return Rational(self.value ** obj.value)
 
 
-
 class Matrice:
 
     def __init__(self):
@@ -132,17 +125,19 @@ class Matrice:
     def print(self, index):
         output = ""
         if index is not None:
-            u.out(index + " = ")
-        for m in self.array:
-            first = True
-            output += '[ '
-            for e in m:
-                if not first:
-                    output += ", "
-                output += e.str
-                first = False
-            output += ' ]\n  '
-        u.out(output)
+            print("  " + index + " = " + self.str)
+        else:
+            for m in self.array:
+                first = True
+                output += '[ '
+                for e in m:
+                    if not first:
+                        output += ", "
+                    output += e.str
+                    first = False
+                output += ' ]\n  '
+            else:
+                u.out(output)
 
     def getType(self):
         return "matrice"
@@ -159,32 +154,33 @@ class Matrice:
         new = copy.deepcopy(self.array)
         type = obj.getType()
 
-        if operation == "fn":
-            for i in range(len(new)):
-                for j in range(len(new[i])):
-                    new[i][j] = obj.compute(new[i][j])
-
-        elif operation == "+":
+        if operation == "+":
             if type == "rational" or type == "complex":
-                for i in range(len(new)):
-                    for j in range(len(new[i])):
-                        new[i][j] = new[i][j].calc('+', obj)
+                u.warn("Can't add a rational to a matrice.", "error")
 
             elif type == "matrice":
-                for i in range(len(new)):
-                    for j in range(len(new[i])):
-                        new[i][j] = new[i][j].calc('+', obj.array[i][j])
+                if self.height == obj.height and self.width == obj.width:
+                    for i in range(len(new)):
+                        for j in range(len(new[i])):
+                            new[i][j] = new[i][j].calc('+', obj.array[i][j])
+                else:
+                    u.warn("Can't add matrices of different dimensions.", "error")
 
         elif operation == "-":
+            print("in minus")
             if type == "rational" or type == "complex":
-                for i in range(len(new)):
-                    for j in range(len(new[i])):
+                for i in range(self.height):
+                    for j in range(self.width):
+                        print("wtf")
                         new[i][j] = new[i][j].calc('-', obj)
 
             elif type == "matrice":
-                for i in range(len(new)):
-                    for j in range(len(new[i])):
-                        new[i][j] = new[i][j].calc('-', obj.array[i][j])
+                if self.height == obj.height and self.width == obj.width:
+                    for i in range(len(new)):
+                        for j in range(len(new[i])):
+                            new[i][j] = new[i][j].calc('-', obj.array[i][j])
+                else:
+                    u.warn("Can't substract matrices of different dimensions.", "error")
 
         elif operation == "*":
             if type == "rational" or type == "complex":
@@ -221,7 +217,6 @@ class Matrice:
                         new[i][j] = new[i][j].calc('/', obj)
 
             elif type == "matrice":
-                #TODO checker divisions de matrices
                 u.warn("Can't divide a matrice by a matrice.", "error")
 
         elif operation == "%":
@@ -231,9 +226,7 @@ class Matrice:
                         new[i][j] = new[i][j].calc('%', obj)
 
             elif type == "matrice":
-                for i in range(self.height):
-                    for j in range(self.width):
-                        new[i][j] = new[i][j].calc('%', obj.array[i][j])
+                u.warn("Can't modulo a matrice by a matrice", "error")
 
         elif operation == '^':
             if type != "rational":
@@ -264,7 +257,7 @@ class Matrice:
                 ret.str += ret.array[i][j].str
             ret.str += ']'
         ret.str += ']'
-
+        print(ret.str)
         return ret
 
 
@@ -278,17 +271,20 @@ class Complex:
 
     def parse(self, exp):
         match = re.search(regex.complex, exp)
-        self.str = exp
-        print(match.group(1))
-        print(match.group(2))
         self.real = 0 if match.group(1) is None else u.intFloatCast(match.group(1).replace(" ", ""))
         self.imaginary = u.intFloatCast(match.group(2).replace(" ", ""))
         self.imgIsNeg = self.imaginary < 0
+        self.str = (str(self.real) + (
+            " + " if not self.imgIsNeg and self.imaginary != 0 else " ") if self.real != 0 else "") + (
+                      (str(self.imaginary) + "i") if self.imaginary != 0 else "")
+
         return self
 
     def print(self, index):
         if index is None:
             u.out(self.str)
+        else:
+            print("  " + index + " = " + self.str)
 
     def getType(self):
         return "complex"
@@ -298,96 +294,14 @@ class Complex:
         ret.real = -self.real
         ret.imaginary = -self.imaginary
         ret.imgIsNeg = ret.imaginary < 0
-        ret.str = (str(ret.real) + (" + " if not ret.imgIsNeg else " ") if ret.real != 0 else "") + str(ret.imaginary) + "i"
+        ret.str = (str(ret.real) + (
+            " + " if not ret.imgIsNeg and ret.imaginary != 0 else " ") if ret.real != 0 else "") + (
+                      (str(ret.imaginary) + "i") if ret.imaginary != 0 else "")
         return ret
 
     def calc(self, operation, obj):
         ret = copy.deepcopy(self)
         type = obj.getType()
-        i = 0
-
-        if operation == "fn":
-            datas = {}
-            formated = obj.formated
-            match = re.search("X\*\*(\d+)", formated)
-            if match:
-                pow = u.intFloatCast(match.group(1))
-                sub = "X"
-                for i in range(pow - 1):
-                    sub += " * X"
-                formated = re.sub("X\*\*\d+", sub, formated)
-            while re.search("(?:^| )X(?: |$)", formated):
-                key = "com" + str(i)
-                i += 1
-                formated = formated.replace("X", key, 1)
-                datas[key] = self
-            match = True
-            while match is not None:
-                # print(formated)
-                match = re.search("(\d+|com\d+)\s*([\*\/\%])\s*(\d+|com\d+)", formated)
-                if match:
-                  #print(match)
-                    string = match.group(0)
-                    var1 = match.group(1)
-                    ope = match.group(2)
-                    var2 = match.group(3)
-                    com = 0
-                    if var1.isnumeric():
-                        var1 = Rational(u.intFloatCast(var1))
-                    else:
-                        var1 = datas[var1]
-                        com += 1
-                    if var2.isnumeric():
-                        var2 = Rational(u.intFloatCast(var2))
-                    else:
-                        var2 = datas[var2]
-                        com += 1
-                    if com > 0:
-                        key = "com" + str(i)
-                        i += 1
-                        datas[key] = var1.calc(ope, var2)
-                        formated = formated.replace(string, key, 1)
-                      #print(formated)
-                    else:
-                        # print("in")
-                        formated = formated.replace(string, var1.calc(ope, var2).str, 1)
-            # print(formated)
-            match = True
-            while match is not None:
-                match = re.match("(\d+|com\d+)\s*([\+\-])\s*(\d+|com\d+)", formated)
-                if match:
-                    string = match.group(0)
-                    var1 = match.group(1)
-                    ope = match.group(2)
-                    var2 = match.group(3)
-                    com = 0
-                    if var1.isnumeric():
-                        var1 = Rational(u.intFloatCast(var1))
-                    else:
-                        var1 = datas[var1]
-                        com += 1
-                    if var2.isnumeric():
-                        var2 = Rational(u.intFloatCast(var2))
-                    else:
-                        var2 = datas[var2]
-                        com += 1
-                    if com > 0:
-                        key = "com" + str(i)
-                        i += 1
-                        datas[key] = var1.calc(ope, var2)
-                        formated = formated.replace(string, key, 1)
-                      #print(formated)
-                    else:
-                        # print("in formated")
-                        # print(formated)
-                        formated = formated.replace(string, var1.calc(ope, var2).str, 1)
-                        # print(formated)
-                        # print("out formated")
-            # print(formated)
-            if formated.strip() in datas.keys():
-                return datas[formated.strip()]
-            else:
-                u.warn("Syntax error.", "error")
 
         if operation == "+":
             if type == "rational":
@@ -429,8 +343,6 @@ class Complex:
                 old = ret.real
                 ret.real = ret.real * obj.real - ret.imaginary * obj.imaginary
                 ret.imaginary = old * obj.imaginary + ret.imaginary * obj.real
-                print(ret.real)
-                print(ret.imaginary)
 
             elif type == "matrice":
                 ret = copy.deepcopy(obj)
@@ -440,23 +352,21 @@ class Complex:
 
         elif operation == "/":
             if type == "rational":
-                ret.real /= obj.value
-                ret.imaginary /= obj.value
-                ret.imgIsNeg = ret.imaginary < 0
+                ret.real = ret.real / obj.value
+                ret.imaginary = ret.imaginary / obj.value
 
             elif type == "complex":
-                # TODO checker complexe / complexe
-                u.warn("Can't devide a complex by a complex.", "todo")
+                div = Rational(obj.real**2 + obj.imaginary**2)
+                conj = copy.deepcopy(obj)
+                conj.imaginary = -conj.imaginary
+                ret = self.calc('*', conj)
+                ret = ret.calc('/', div)
 
             elif type == "matrice":
                 ret = copy.deepcopy(obj)
                 for i in range(obj.height):
                     for j in range(obj.width):
                         ret.array[i][j] = self.calc('*', obj.array[i][j])
-
-            elif type == "function":
-                u.warn("complexe * fonctions a gerer", "todo")
-                # TODO checker si les fonctions sont bien évaluées
 
         elif operation == "%":
             if type == "rational":
@@ -474,21 +384,14 @@ class Complex:
                     for j in range(obj.width):
                         ret.array[i][j] = self.calc('%', obj.array[i][j])
 
-            elif type == "function":
-                # TODO checker si les fonctions sont bien évaluées
-                u.warn("complexe * fonctions a gerer", "todo")
-
         elif operation == '^':
-            print("in")
             if type != "rational":
                 u.warn("Can't elevate a complex to a " + type + ".", "error")
-            print(ret.real)
-            print(ret.imaginary)
             for i in range(obj.value):
                 ret *= self.calc('*', self)
         if ret.getType() == "complex":
+            ret.real = u.intFloatCast(str(ret.real))
+            ret.imaginary = u.intFloatCast(str(ret.imaginary))
             ret.imgIsNeg = ret.imaginary < 0
             ret.str = (str(ret.real) + (" + " if not ret.imgIsNeg and ret.imaginary != 0 else " ") if ret.real != 0 else "") + ((str(ret.imaginary) + "i") if ret.imaginary != 0 else "")
-        ret.print(None)
-        print(ret.str)
         return ret
