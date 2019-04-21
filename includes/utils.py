@@ -34,14 +34,16 @@ def out(output):
 
 
 def intFloatCast(exp):
-    match = re.match("\s*-?\s*\d+\.(\d+)", exp)
+    match = re.match("\s*[-+]?\s*\d+\.(\d+)", exp)
     if match:
         if match.group(1) != '0':
             return float(exp)
         else:
             return int(float(exp))
-    else:
+    elif re.match("\s*[-+]?\s*\d+", exp):
         return int(exp)
+    else:
+        return None
 
 
 def warn(message, category):

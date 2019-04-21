@@ -1,245 +1,14 @@
 import sys
 import re
 import tests as t
+from resolve import resolve
 from includes import utils as u, regex
 from includes.types import Matrice, Rational, Function, Complex
 
 data = {}
 
-def evalMatriceComplex(exp):
-    i = 0
-    j = 0
-    match = True
-    tmp = {}
-    print(exp)
-    match = True
-    while match:
-        match = re.search(regex.complex, exp)
-        if match:
-            c = Complex()
-            string = match.group(0)
-            key = "com" + str(j)
-            j += 1
-            tmp[key] = c.parse(string)
-            exp = exp.replace(string, key)
 
-    match = True
-    while match:
-        match = re.search("(?:\W|^)(?!mat|com)(fun[a-zA-Z]\([a-zA-Z]+\)|[a-zA-Z]+)", exp)
-        if match:
-            key = match.group(1).strip()
-            if key in data.keys():
-                var = data[key]
-                if var.getType() == "rational":
-                    exp = exp.replace(match.group(0), var.str)
-                elif var.getType() == "matrice":
-                    tmp["mat" + str(i)] = var
-                    exp = exp.replace(key, "mat" + str(i), 1)
-                    i += 1
-                elif var.getType() == "complex":
-                    tmp["com" + str(j)] = var
-                    exp = exp.replace(key, "com" + str(j), 1)
-                    j += 1
-            elif key[0:4] in data.keys():
-                fn = re.match(regex.evalFunc, key)
-                func = data[key[0:4]]
-                if fn.group(2).strip() in data.keys():
-                    param = data[fn.group(2).strip()]
-                    # print(param.getType())
-                    if param.getType() == "matrice":
-                        # print("ok")
-                        tmp["mat" + str(i)] = param.calc("fn", func)
-                        exp = exp.replace(key, "mat" + str(i), 1)
-                        i += 1
-                    elif param.getType() == "complex":
-                        # print("ok")
-                        tmp["com" + str(j)] = param.calc("fn", func)
-                        exp = exp.replace(key, "com" + str(j), 1)
-                        j += 1
-    # print(exp)
-    match = True
-    while match:
-        match = re.search("(\d+|mat\d+|com\d+)\s*([\*\/\%\^])\s*(\d+|mat\d+|com\d+)", exp)
-        if match:
-            string = match.group(0)
-            nb1 = match.group(1)
-            ope = match.group(2)
-            nb2 = match.group(3)
-            if nb1.isnumeric() and nb2.isnumeric():
-                exp = exp.replace(string, str(eval(string)), 1)
-            else:
-                if nb1.isnumeric() and nb2 in tmp.keys():
-                    var = tmp[nb2]
-                    if var.getType == "matrice":
-                        key = "mat" + str(i)
-                        i += 1
-                    else:
-                        key = "com" + str(j)
-                        j += 1
-                    tmp[key] = Rational(u.intFloatCast(nb1)).calc(ope, var)
-                elif nb2 in tmp.keys() and nb1 in tmp.keys():
-                    var1 = tmp[nb1]
-                    var2 = tmp[nb2]
-                    if var1.getType() == "complex" and var2.getType() == "complex":
-                        key = "com" + str(j)
-                        j += 1
-                    else:
-                        key = "mat" + str(i)
-                        i += 1
-                    tmp[key] = var1.calc(ope, var2)
-                else:
-                    if nb1 in tmp.keys():
-                        var = tmp[nb1]
-                        if var.getType == "matrice":
-                            key = "mat" + str(i)
-                            i += 1
-                        else:
-                            key = "com" + str(j)
-                            j += 1
-                        tmp[key] = var.calc(ope, Rational(u.intFloatCast(nb2)))
-                exp = exp.replace(string, key, 1)
-    match = True
-    while match:
-        match = re.search("(\d+|mat\d+|com\d+)\s*([\+\-])\s*(\d+|mat\d+|com\d+)", exp)
-        if match:
-            string = match.group(0)
-            nb1 = match.group(1)
-            ope = match.group(2)
-            nb2 = match.group(3)
-            if nb1.isnumeric() and nb2.isnumeric():
-                exp = exp.replace(string, str(eval(string)), 1)
-            else:
-                # print(nb1)
-                # print(ope)
-                # print(nb2)
-                if nb1 in tmp.keys() and nb2 in tmp.keys():
-                    var1 = tmp[nb1]
-                    var2 = tmp[nb2]
-                    if var1.getType() == "complex" and var2.getType() == "complex":
-                        key = "com" + str(j)
-                        j += 1
-                    else:
-                        key = "mat" + str(i)
-                        i += 1
-                    tmp[key] = var1.calc(ope, var2)
-                elif nb1.isnumeric() and nb2 in tmp.keys():
-                        var = tmp[nb2]
-                        if var.getType() == "complex":
-                            key = "com" + str(j)
-                            j += 1
-                        else:
-                            key = "mat" + str(i)
-                            i += 1
-                        tmp[key] = Rational(u.intFloatCast(nb1)).calc(ope, var)
-                else:
-                    # print("wtf")
-                    if nb1 in tmp.keys():
-                        # print("wtf")
-                        var = tmp[nb1]
-                        if var.getType() == "complex":
-                            # print("wtf")
-                            key = "com" + str(j)
-                            j += 1
-                        else:
-                            key = "mat" + str(i)
-                            i += 1
-                        tmp[key] = var.calc(ope, Rational(u.intFloatCast(nb2)))
-                exp = exp.replace(string, key, 1)
-                print(exp)
-                i += 1
-    print(exp)
-    if exp.strip() in tmp.keys():
-        return tmp[exp.strip()]
-    else:
-        u.warn("Syntax error.", "error")
-
-
-def evalFunction(exp):
-    match = re.findall(regex.evalFunc, exp)
-    # print(exp)
-    if match:
-        print(match)
-        for m in match:
-            fun = m[0]
-            param = m[1]
-            if fun in data.keys():
-                fn = data[fun]
-                if param.isnumeric():
-                    # print(exp)
-                    exp = re.sub(fun + "\(" + param + "\)", fn.compute(Rational(param)).str, exp)
-                elif param in data.keys():
-                    type = data[param].getType()
-                    if type == "rational":
-                        exp = re.sub(fun + "\(" + param + "\)", fn.compute(data[param]).str, exp)
-                    elif type == "matrice" or type == "complex":
-                        continue
-                else:
-                    obj = evaluate(param)
-                    if obj.getType() == "rational":
-                        exp = exp.replace(fun + "(" + param + ")", fn.compute(obj).value)
-                    else:
-                        u.warn("The variable " + param + " is not assigned.", "error")
-            else:
-                u.warn("The function " + fun + " is not assigned.", "error")
-    return exp
-
-
-def evalRationals(exp):
-    match = re.findall(regex.checkLetter, exp)        # replace X || y by their result
-    if match:
-        for m in match:
-            var = m[0]
-            if var in data.keys():
-                if data[var].getType() == "rational":
-                    exp = re.sub(var, str(data[var].str), exp)
-    return exp
-
-
-def unknownTypes(exp):
-    match = re.findall("(?:\W|^)(?!mat)(?!fun[A-Za-z])([a-zA-Z]+)", exp)
-    saved = None
-    if match:
-        for m in match:
-            if m in data.keys():
-                type = data[m].getType()
-                if type != saved and type != 'rational':
-                    if saved is None:
-                        saved = type
-                    else:
-                        return "mixed"
-            else:
-                u.warn("The variable " + m + " is not assigned.", "error")
-    return saved
-
-
-def evaluate(exp):
-    exp = evalFunction(exp)                 # replace funX(y) || funX(5) by their result
-    # print(exp)
-    # print(exp)
-    exp = evalRationals(exp)               # replace X || y by their result
-    print(exp)
-    # print("exp =" + exp)
-    types = unknownTypes(exp)
-    # print(exp)
-    # print(re.match(regex.checkMatrice, exp))
-    if types is not None or re.search(regex.checkMatrice, exp) or "i" in exp:
-        print("goEval")
-        # print(exp)
-        return evalMatriceComplex(exp)
-       # print("stopEval")
-    elif not re.match(regex.checkLetter, exp):
-        # print("test")
-        try:
-            res = eval(exp)
-            # print("ici?")
-            return Rational(round(res, 2))
-        except ZeroDivisionError:
-            u.warn("Division by 0.", "error")
-        except SyntaxError:
-            u.warn("Syntax error.", "error")
-
-
-def countUnknownVars(exp, param):
+def checkUnknownVars(exp, param):
     count = 0
     buff = ""
 
@@ -257,51 +26,20 @@ def countUnknownVars(exp, param):
     else:
         return None
 
+
 def parsePut(key, exp):
-    # print("in put")
-    value = ""
-    if exp in data.keys():                                            # x = y     => assign x
-        value = data[exp]
-    else:
-        match = re.match(regex.func, key)
-        if match:
-            exp = countUnknownVars(exp, match.group(2).strip())
-            if exp is not None:
-                # print(value)
-                # print(exp)
-                value = Function(exp, match.group(2))
-                key = match.group(1)[0:4]
-                # print("wtf")
-            else:
-                u.warn("Too many unknown variables.", "error")
+    match = re.match(regex.func, key)
+    if match:
+        exp = checkUnknownVars(exp, match.group(2).strip())
+        if exp is not None:
+            value = Function(exp, match.group(2))
+            key = match.group(1)[0:4]
         else:
-            if re.match(regex.checkMatrice, exp):
-                mat = Matrice()
-                value = Matrice.parse(mat, exp)
-            elif re.match(regex.complex, exp):
-                z = Complex()
-                value = Complex.parse(z, exp)
-            else:                            # x = 3 || x = y + 3 || x = funX(2) etc.
-                value = evaluate(exp)
+            u.warn("Too many unknown variables.", "error")
+    else:
+        value = resolve(exp, data)
     data[key] = value
     data[key].print(None)
-
-
-def parseGet(key):
-    # print(key)
-    if key in data.keys():                                                                      # "x = ?"
-        data[key].print(None)
-    elif re.search(regex.checkLetter, key):
-        res = evaluate(key)
-        res.print(None)
-    else:                              # "5 + 5 = ?"
-        try:
-            res = eval(u.formatLine(key))
-            Rational(res).print(None)
-        except ZeroDivisionError:
-            u.warn("Division by 0.", "error")
-        except SyntaxError:
-            u.warn("Syntax error.", "error")
 
 
 def compute(line):
@@ -311,7 +49,9 @@ def compute(line):
         key = get.group(1).strip()
         if key == "" or '=' in key:
             u.warn("Syntax error.", "error")
-        parseGet(key)
+        res = resolve(key, data)
+        res.print(None)
+        # parseGet(key)
     elif put:
         exp = put.group(2).strip()
         if exp == "" or '=' in exp or '?' in exp:
@@ -345,7 +85,6 @@ def main():
                 continue
             else:
                 try:
-                   # print(line)
                     compute(line)
                 except Exception:
                     pass
