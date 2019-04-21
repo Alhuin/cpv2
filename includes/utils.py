@@ -72,22 +72,18 @@ def read_in():
 
 
 def checkUnknownVars(exp, param, data):
-    count = 0
-    buff = ""
 
     match = re.findall(regex.checkLetter, exp)
     for m in match:
         key = m.strip()
-        if key not in data.keys():
-            if key != "i" and m not in buff:
-                buff += m
-                count += 1
-        elif param != key:
-            exp = exp.replace(key, data[key].str)
-    if count < 2:
-        return exp
-    else:
-        return None
+        if key != param:
+            if key not in data.keys():
+                return None
+            else:
+                exp = re.sub("(\d)" + key, r"\1 * " + key, exp, 1)
+                # exp = exp.replace(key, data[key].str)
+
+    return exp
 
 
 def formatLine(line):

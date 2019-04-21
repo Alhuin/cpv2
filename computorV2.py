@@ -12,6 +12,7 @@ def parsePut(key, exp, data):
     if match:
         exp = u.checkUnknownVars(exp, match.group(2).strip(), data)
         if exp is not None:
+            print(match)
             value = Function(exp, match.group(2))
             key = match.group(1)[0:4]
         else:
