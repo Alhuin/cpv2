@@ -12,7 +12,6 @@ def parsePut(key, exp, data):
     if match:
         exp = u.checkUnknownVars(exp, match.group(2).strip(), data)
         if exp is not None:
-            print(match)
             value = Function(exp, match.group(2))
             key = match.group(1)[0:4]
         else:
@@ -55,6 +54,10 @@ def main():
             line = u.read_in()
             if line == "env":
                 u.printEnv(data)
+                continue
+            if line == "history":
+                u.printHistory()
+                # print("hum")
                 continue
             compute(line, data)
         except KeyboardInterrupt:

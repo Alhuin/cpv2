@@ -1,9 +1,13 @@
 import re
+import readline
+
 import tests as t
 from includes import regex
 from includes.customError import CustomError
 import sys
+import click
 
+history = []
 
 def test():
     if t.i < len(t.tests):
@@ -26,15 +30,18 @@ def out(output):
 
 
 def intFloatCast(exp):
-    match = re.match("\s*[-+]?\s*\d+\.(\d+)", exp)
-    if match:
-        if match.group(1) != '0':
-            return float(exp)
+    try:
+        match = re.match("\s*[-+]?\s*\d+\.(\d+)", exp)
+        if match:
+            if match.group(1) != '0':
+                return float(exp)
+            else:
+                return int(float(exp))
+        elif re.match("\s*[-+]?\s*\d+", exp):
+            return int(exp)
         else:
-            return int(float(exp))
-    elif re.match("\s*[-+]?\s*\d+", exp):
-        return int(exp)
-    else:
+            return None
+    except ValueError:
         return None
 
 
@@ -58,7 +65,14 @@ def printEnv(data):
     print('\n')
 
 
+def printHistory():
+    print("\n  HISTORY")
+    for input in history:
+        print(input)
+    print("\n")
+
 def read_in():
+    global history
     if t.test:
         line = test()
     else:
@@ -68,6 +82,8 @@ def read_in():
         sys.exit()
     if line == "":
         warn("Empty input", "SyntaxError")
+    else:
+        history.append(line)
     return line
 
 
