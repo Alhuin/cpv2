@@ -1,8 +1,8 @@
 import re
 import tests as t
 from includes import regex
+from includes.customError import CustomError
 import sys
-
 
 def test():
     if t.i < len(t.tests):
@@ -55,7 +55,7 @@ def warn(message, category):
         t.test_output(output)
     else:
         print(output)
-    raise Exception
+    raise CustomError
 
 
 def printEnv(data):

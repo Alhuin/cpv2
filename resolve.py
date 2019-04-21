@@ -1,5 +1,5 @@
 import re
-from includes.types import Complex, Matrice, Rational, Function
+from includes.types import Complex, Matrice, Rational
 from includes import regex, utils as u
 
 
