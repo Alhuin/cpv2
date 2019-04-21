@@ -4,6 +4,7 @@ from includes import regex
 from includes.customError import CustomError
 import sys
 
+
 def test():
     if t.i < len(t.tests):
         if t.tests[t.i]["input"] == "desc":
@@ -15,15 +16,6 @@ def test():
         return t.tests[t.i]["input"]
     else:
         exit()
-
-
-def countUnknownVars(exp):
-    match = re.findall(regex.checkLetter, exp)
-    saved = ""
-    for m in match:
-        if m not in saved:
-            saved += m
-    return len(saved)
 
 
 def out(output):
@@ -66,8 +58,7 @@ def printEnv(data):
     print('\n')
 
 
-def read_in(data):
-
+def read_in():
     if t.test:
         line = test()
     else:
@@ -80,16 +71,23 @@ def read_in(data):
     return line
 
 
-def checkType(str, data):
-    if 'i' in str:
-        return "complex"
+def checkUnknownVars(exp, param, data):
+    count = 0
+    buff = ""
+
+    match = re.findall(regex.checkLetter, exp)
+    for m in match:
+        key = m.strip()
+        if key not in data.keys():
+            if key != "i" and m not in buff:
+                buff += m
+                count += 1
+        elif param != key:
+            exp = exp.replace(key, data[key].str)
+    if count < 2:
+        return exp
     else:
-        match = re.findall("\W(?!fun[A-Z])([A-Za-z])", str)
-        for m in match :
-            if m in data.keys():
-                if data[m].getType() == "matrice":
-                    return "matrice"
-        return "rational"
+        return None
 
 
 def formatLine(line):

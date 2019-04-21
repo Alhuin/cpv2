@@ -3,7 +3,7 @@ from includes.types import Complex, Matrice, Rational
 from includes import regex, utils as u
 
 
-def unknowns(exp, data, i, tmp):
+def parse(exp, data, i, tmp):
     match = True
 
     # print("handling complexes")
@@ -113,7 +113,11 @@ def unknowns(exp, data, i, tmp):
     return {"exp": exp, "index": i, "tmp": tmp}
 
 
-def compute(exp, i, tmp):
+def compute(parsed):
+
+    i = parsed["index"]
+    exp = parsed["exp"]
+    tmp = parsed["tmp"]
 
     # print("Computing powers")
     match = True
@@ -174,8 +178,8 @@ def resolve(exp, data):
     tmp = {}
     if exp.strip() in data.keys():
         return data[exp.strip()]
-    exp = unknowns(exp, data, i, tmp)
-    return compute(exp["exp"], exp["index"], exp["tmp"])
+    parsed = parse(exp, data, i, tmp)
+    return compute(parsed)
 
 
 # def main():

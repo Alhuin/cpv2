@@ -2,34 +2,15 @@ import sys
 import re
 import tests as t
 from resolve import resolve
-from includes.customError import CustomError
 from includes import utils as u, regex
+from includes.customError import CustomError
 from includes.types import Function
-
-
-def checkUnknownVars(exp, param, data):
-    count = 0
-    buff = ""
-
-    match = re.findall(regex.checkLetter, exp)
-    for m in match:
-        key = m.strip()
-        if key not in data.keys():
-            if key != "i" and m not in buff:
-                buff += m
-                count += 1
-        elif param != key:
-            exp = exp.replace(key, data[key].str)
-    if count < 2:
-        return exp
-    else:
-        return None
 
 
 def parsePut(key, exp, data):
     match = re.match(regex.func, key)
     if match:
-        exp = checkUnknownVars(exp, match.group(2).strip(), data)
+        exp = u.checkUnknownVars(exp, match.group(2).strip(), data)
         if exp is not None:
             value = Function(exp, match.group(2))
             key = match.group(1)[0:4]
@@ -70,7 +51,7 @@ def main():
     line = ""
     while line is not None:
         try:
-            line = u.read_in(data)
+            line = u.read_in()
             if line == "env":
                 u.printEnv(data)
                 continue
