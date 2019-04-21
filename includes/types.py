@@ -28,7 +28,6 @@ class Function:
         plt.show()
 
 
-
 class Rational:
 
     def __init__(self, value):
@@ -63,7 +62,7 @@ class Rational:
 
             elif type == "matrice":
                 #TODO checker real - matrice
-                u.warn("Can't substract a matrice to a rational.", "error")
+                u.warn("Can't substract a matrice to a rational.", "ComputeError")
 
             elif type == "complex":
                 ret = obj.negate()
@@ -79,21 +78,20 @@ class Rational:
         elif operation == '/':
             #TODO checker rational / matrice | complexe
             if type != "rational":
-                u.warn("Can't divide a rational by a " + type + ".", "error")
-            # print("div = " + obj.value)
+                u.warn("Can't divide a rational by a " + type + ".", "ComputeError")
             if obj.value == 0:
-                u.warn("Division by 0.", "error")
+                u.warn("Division by 0.", "ComputeError")
             return Rational(round(self.value / obj.value, 2))
 
         elif operation == '%':
             #TODO checker rational % matrice | complexe
             if type != "rational":
-                u.warn("Can't divide a rational by a " + type + ".", "error")
+                u.warn("Can't divide a rational by a " + type + ".", "ComputeError")
             return Rational(round(self.value % obj.value, 2))
 
         elif operation == '^':
             if type != "rational":
-                u.warn("Can't elevate a rational to a " + type + ".", "error")
+                u.warn("Can't elevate a rational to a " + type + ".", "ComputeError")
             return Rational(round(self.value ** obj.value, 2))
 
 
@@ -115,10 +113,9 @@ class Matrice:
             if width is None:
                 width = len(elems)
             elif width != len(elems):
-                u.warn("Syntax : Matrice not well formated.", "error")
+                u.warn("Matrice not well formated.", "syntaxError")
             for e in elems:
                 matrice[height].append(Rational(u.intFloatCast(e)))
-                # print(e)
             height += 1
         self.height = height
         self.width = width
@@ -160,7 +157,7 @@ class Matrice:
 
         if operation == "+":
             if type == "rational" or type == "complex":
-                u.warn("Can't add a rational to a matrice.", "error")
+                u.warn("Can't add a rational to a matrice.", "ComputeError")
 
             elif type == "matrice":
                 if self.height == obj.height and self.width == obj.width:
@@ -168,15 +165,14 @@ class Matrice:
                         for j in range(len(new[i])):
                             new[i][j] = new[i][j].calc('+', obj.array[i][j])
                 else:
-                    u.warn("Can't add matrices of different dimensions.", "error")
+                    u.warn("Can't add matrices of different dimensions.", "ComputeError")
 
         elif operation == "-":
             if type == "rational":
-                u.warn("Can't substract a rational to a matrice.", "error")
+                u.warn("Can't substract a rational to a matrice.", "ComputeError")
             elif type == "complex":
                 for i in range(self.height):
                     for j in range(self.width):
-                        # print("wtf")
                         new[i][j] = new[i][j].calc('-', obj)
 
             elif type == "matrice":
@@ -185,7 +181,7 @@ class Matrice:
                         for j in range(len(new[i])):
                             new[i][j] = new[i][j].calc('-', obj.array[i][j])
                 else:
-                    u.warn("Can't substract matrices of different dimensions.", "error")
+                    u.warn("Can't substract matrices of different dimensions.", "ComputeError")
 
         elif operation == "*":
             if type == "rational" or type == "complex":
@@ -213,7 +209,7 @@ class Matrice:
                         i += 1
                 else:
                     u.warn("Can't resolve m1 * m2 : Number of raws in m1 doesn't match number of columns in m2.",
-                           "error")
+                           "ComputeError")
 
         elif operation == "/":
             if type == "rational" or type == "complex":
@@ -222,7 +218,7 @@ class Matrice:
                         new[i][j] = new[i][j].calc('/', obj)
 
             elif type == "matrice":
-                u.warn("Can't divide a matrice by a matrice.", "error")
+                u.warn("Can't divide a matrice by a matrice.", "ComputeError")
 
         elif operation == "%":
             if type == "rational" or type == "complex":
@@ -231,11 +227,11 @@ class Matrice:
                         new[i][j] = new[i][j].calc('%', obj)
 
             elif type == "matrice":
-                u.warn("Can't modulo a matrice by a matrice", "error")
+                u.warn("Can't modulo a matrice by a matrice", "ComputeError")
 
         elif operation == '^':
             if type != "rational":
-                u.warn("Can't elevate a matrice to a " + type + ".", "error")
+                u.warn("Can't elevate a matrice to a " + type + ".", "ComputeError")
             tmp = copy.deepcopy(self)
             for i in range(obj.value - 1):
                 tmp = tmp.calc('*', self)
@@ -261,7 +257,6 @@ class Matrice:
                 ret.str += ret.array[i][j].str
             ret.str += ']'
         ret.str += ']'
-        # print(ret.str)
         return ret
 
 
@@ -275,13 +270,8 @@ class Complex:
 
     def parse(self, exp):
         match = re.search(regex.complex, exp)
-        # print(int(match.group(2).replace(" ", "")))
-        # print(match.group(0))
-        # print(match.group(1))
-        # print(match.group(2))
         self.real = 0 if match.group(1) is None else u.intFloatCast(match.group(1).replace(" ", ""))
         self.imaginary = u.intFloatCast(match.group(2).replace(" ", ""))
-        # print(self.imaginary)
         self.imgIsNeg = self.imaginary < 0
         self.str = (str(self.real) + (
             " + " if not self.imgIsNeg and self.imaginary != 0 else " ") if self.real != 0 else "") + (
@@ -395,7 +385,7 @@ class Complex:
 
         elif operation == '^':
             if type != "rational":
-                u.warn("Can't elevate a complex to a " + type + ".", "error")
+                u.warn("Can't elevate a complex to a " + type + ".", "ComputeError")
             for i in range(obj.value):
                 ret = copy.deepcopy(self)
                 for i in range(obj.value - 1):

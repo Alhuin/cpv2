@@ -49,15 +49,25 @@ def intFloatCast(exp):
 def warn(message, category):
     if category == "error":
         output = ("\033[31m[Error]\033[0m " + message)
-        if t.test:
-            t.test_output(output)
-        else:
-            print(output)
+    else:
+        output = "\033[31m[" + category + "]\033[0m " + message
+    if t.test:
+        t.test_output(output)
+    else:
+        print(output)
     raise Exception
 
 
-def read_in():
-    global history
+def printEnv(data):
+    t.i += 1
+    print("\n   ENV")
+    for index, var in enumerate(data):
+        data[var].print(var)
+    print('\n')
+
+
+def read_in(data):
+
     if t.test:
         line = test()
     else:
@@ -65,6 +75,8 @@ def read_in():
         line = user_input.strip()
     if line == "q" or line == "quit" or line == "exit":
         sys.exit()
+    if line == "":
+        warn("Empty input", "SyntaxError")
     return line
 
 

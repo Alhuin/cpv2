@@ -2,19 +2,22 @@ test = False
 
 i = 0
 
+ret = ""
+
 tests = [
 
     {"input": "desc", "output": "Bad syntax"},
-    {"input": "x == 5", "output": "\033[31m[Error]\033[0m Syntax error."},
-    {"input": "x = g", "output": "\033[31m[Error]\033[0m The variable g is not assigned."},
-    {"input": "x = 5 = ?", "output": "\033[31m[Error]\033[0m Syntax error."},
-    {"input": "x = 3 + 5 ?", "output": "\033[31m[Error]\033[0m Syntax error."},
-    {"input": "x + 8 = 5", "output": "\033[31m[Error]\033[0m Syntax error."},
-    {"input": "x = 10 / 0", "output": "\033[31m[Error]\033[0m Division by 0."},
+    {"input": "x == 5", "output": "\033[31m[SyntaxError]\033[0m Invalid input."},
+    {"input": "x = 22e-+dd5-+", "output": "\033[31m[NameError]\033[0m The variable e is not assigned."},
+    {"input": "x = g", "output": "\033[31m[NameError]\033[0m The variable g is not assigned."},
+    {"input": "x = 5 = ?", "output": "\033[31m[SyntaxError]\033[0m Invalid input."},
+    {"input": "x = 3 + 5 ?", "output": "\033[31m[SyntaxError]\033[0m Invalid input."},
+    {"input": "x + 8 = 5", "output": "\033[31m[SyntaxError]\033[0m Invalid input."},
+    {"input": "x = 10 / 0", "output": "\033[31m[ComputeError]\033[0m Division by 0."},
     {"input": "x = 5", "output": "5"},
-    {"input": "x / 0 = ?", "output": "\033[31m[Error]\033[0m Division by 0."},
-    {"input": "x / 0 ?", "output": "\033[31m[Error]\033[0m Syntax error."},
-    {"input": "i = 8", "output": "\033[31m[Error]\033[0m Can't assign the variable i."},
+    {"input": "x / 0 = ?", "output": "\033[31m[ComputeError]\033[0m Division by 0."},
+    {"input": "x / 0 ?", "output": "\033[31m[SyntaxError]\033[0m Invalid input."},
+    {"input": "i = 8", "output": "\033[31m[NameError]\033[0m Can't assign the variable i."},
     {"input": "env", "output": ""},
 
     {"input": "desc", "output": "Assignation et calculs de réels"},
@@ -43,7 +46,7 @@ tests = [
     {"input": "funX(x) + y = ?", "output": "28.2"},
     {"input": "funY(b)= b + 6", "output": "b + 6"},
     {"input": "funX(2) + funY(5) = ?", "output": "31"},
-    {"input": "funA(q) = q + w", "output": "\033[31m[Error]\033[0m Too many unknown variables."},
+    {"input": "funA(q) = q + w", "output": "\033[31m[SyntaxError]\033[0m Too many unknown variables."},
     {"input": "z = funX(x) + 7 - funY(3)", "output": "14.2"},
     {"input": "z*2 = ?", "output": "28.4"},
     {"input": "funX(3) = ?", "output": "45"},
@@ -54,18 +57,18 @@ tests = [
     {"input": "z = ?", "output": "[ 1, 2 ]\n  [ 2, 3 ]\n  "},
     {"input": "z * 2 = ?", "output": "[ 2, 4 ]\n  [ 4, 6 ]\n  "},
     {"input": "v = [[5,12];[50,23]]", "output": "[ 5, 12 ]\n  [ 50, 23 ]\n  "},
-    {"input": "v - z + 5 * 2 + v = ?", "output": "\033[31m[Error]\033[0m Can't add a rational to a matrice."},
+    {"input": "v - z + 5 * 2 + v = ?", "output": "\033[31m[ComputeError]\033[0m Can't add a rational to a matrice."},
     {"input": "v * z = ?", "output": "[ 29, 46 ]\n  [ 96, 169 ]\n  "},
     {"input": "v^2 = ?", "output": "[ 625, 336 ]\n  [ 1400, 1129 ]\n  "},
-    {"input": "2^v = ?", "output": "\033[31m[Error]\033[0m Can't elevate a rational to a matrice."},
-    {"input": "5-z=?", "output": "\033[31m[Error]\033[0m Can't substract a matrice to a rational."},
+    {"input": "2^v = ?", "output": "\033[31m[ComputeError]\033[0m Can't elevate a rational to a matrice."},
+    {"input": "5-z=?", "output": "\033[31m[ComputeError]\033[0m Can't substract a matrice to a rational."},
     {"input": "z%2=?", "output": "[ 1, 0 ]\n  [ 0, 1 ]\n  "},
     {"input": "z^3=?", "output": "[ 21, 34 ]\n  [ 34, 55 ]\n  "},
-    {"input": "z^v=?", "output": "\033[31m[Error]\033[0m Can't elevate a matrice to a matrice."},
-    {"input": "z/v=?", "output": "\033[31m[Error]\033[0m Can't divide a matrice by a matrice."},
+    {"input": "z^v=?", "output": "\033[31m[ComputeError]\033[0m Can't elevate a matrice to a matrice."},
+    {"input": "z/v=?", "output": "\033[31m[ComputeError]\033[0m Can't divide a matrice by a matrice."},
     {"input": "z/2=?", "output": "[ 0.5, 1.0 ]\n  [ 1.0, 1.5 ]\n  "},
     {"input": " a = [[5];[2]]", "output": "[ 5 ]\n  [ 2 ]\n  "},
-    {"input": " a * z = ?", "output": "\033[31m[Error]\033[0m Can't resolve m1 * m2 : Number of raws in m1 doesn't match number of columns in m2."},
+    {"input": " a * z = ?", "output": "\033[31m[ComputeError]\033[0m Can't resolve m1 * m2 : Number of raws in m1 doesn't match number of columns in m2."},
     {"input": " a = [[5,2]]", "output": "[ 5, 2 ]\n  "},
     {"input": " a * z = ?", "output": "[ 9, 16 ]\n  "},
     {"input": "env", "output": ""},
@@ -92,7 +95,7 @@ tests = [
 
     {"input": "desc", "output": "Fonctions x Matrices"},
     {"input": "funX(z)=?", "output": "[ 25, 40 ]\n  [ 40, 65 ]\n  "},
-    {"input": "a = funX(z) - funX(2)", "output": "\033[31m[Error]\033[0m Can't substract a rational to a matrice."},
+    {"input": "a = funX(z) - funX(2)", "output": "\033[31m[ComputeError]\033[0m Can't substract a rational to a matrice."},
     {"input": "a = funX(z) - z", "output": "[ 24, 38 ]\n  [ 38, 62 ]\n  "},
     {"input": "a = ?", "output": "[ 24, 38 ]\n  [ 38, 62 ]\n  "},
     {"input": "env", "output": ""},
@@ -106,15 +109,10 @@ tests = [
 
 ]
 
-category = ""
-
-ret = ""
-
-warn = False
 
 def test_output(output):
 
-    global tests, test, i, ret, warn
+    global tests, test, i, ret
 
     if tests[i]["output"] == str(output):
         print(ret.ljust(40) + "|    \033[32mOK\033[0m")

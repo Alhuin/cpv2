@@ -35,7 +35,7 @@ def parsePut(key, exp):
             value = Function(exp, match.group(2))
             key = match.group(1)[0:4]
         else:
-            u.warn("Too many unknown variables.", "error")
+            u.warn("Too many unknown variables.", "SyntaxError")
     else:
         value = resolve(exp, data)
     data[key] = value
@@ -48,20 +48,19 @@ def compute(line):
     if get:
         key = get.group(1).strip()
         if key == "" or '=' in key:
-            u.warn("Syntax error.", "error")
+            u.warn("Invalid input.", "SyntaxError")                            #TODO Custom Error
         res = resolve(key, data)
         res.print(None)
-        # parseGet(key)
     elif put:
         exp = put.group(2).strip()
         if exp == "" or '=' in exp or '?' in exp:
-            u.warn("Syntax error.", "error")
+            u.warn("Invalid input.", "SyntaxError")
         key = put.group(1).strip()
         if key == "i":
-            u.warn("Can't assign the variable i.", "error")
+            u.warn("Can't assign the variable i.", "NameError")
         parsePut(key, exp)
     else:
-        u.warn("Syntax error.", "error")
+        u.warn("Invalid input.", "SyntaxError")
 
 
 def main():
@@ -72,24 +71,15 @@ def main():
     line = ""
     while line is not None:
         try:
-            line = u.read_in()
-            if line == "":
-                print("\033[31m[Error]\033[0m Empty input.")
+            line = u.read_in(data)
+            if line == "env":
+                u.printEnv(data)
                 continue
-            elif line == "env":
-                t.i += 1
-                print("\n   ENV")
-                for index, var in enumerate(data):
-                    data[var].print(var)
-                print('\n')
-                continue
-            else:
-                try:
-                    compute(line)
-                except Exception:
-                    pass
+            compute(line)
         except KeyboardInterrupt:
             sys.exit('')
+        except Exception:
+            pass
 
 
 main()
