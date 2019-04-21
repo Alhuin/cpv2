@@ -119,6 +119,7 @@ def compute(parsed):
     exp = parsed["exp"]
     tmp = parsed["tmp"]
 
+    # print("begin " + exp)
     # print("Computing powers")
     match = True
     while match:
@@ -147,7 +148,7 @@ def compute(parsed):
             i += 1
             tmp[key] = ret
             exp = re.sub("(var\d+)\s*([*/%])\s*(var\d+)", key, exp, 1)
-    # print(exp)
+            # print(exp)
 
     # print("Computing add / sub")
     match = True
@@ -171,13 +172,28 @@ def compute(parsed):
         # print(match)
         if match and match.group(1) in tmp.keys():
             return tmp[match.group(1)].negate()
+        elif "i" in exp.strip():
+            c = Complex()
+            return c.parse(exp.strip())
+        else:
+            u.warn("Invalid input.", "SyntaxError")
 
 
 def resolve(exp, data):
     i = 0
     tmp = {}
+    # print(exp)
     if exp.strip() in data.keys():
         return data[exp.strip()]
+    if not re.search("[A-Za-z\[\]]", exp.strip()):
+        try:
+            exp = re.sub("(-?\s*\d+(?:\.\d+)?)\s*(?:\*\*|\^)\s*(\d+(?:\.\d+)?)", r"(\1)**\2", exp)
+            var = round(eval(exp), 2)
+            return Rational(var)
+        except ZeroDivisionError:
+            u.warn("Division by 0.", "ComputeError")
+        except SyntaxError:
+            u.warn("Invalid input", "SyntaxError")
     parsed = parse(exp, data, i, tmp)
     return compute(parsed)
 

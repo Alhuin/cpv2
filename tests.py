@@ -8,6 +8,11 @@ tests = [
 
     {"input": "desc", "output": "Bad syntax"},
     {"input": "x == 5", "output": "\033[31m[SyntaxError]\033[0m Invalid input."},
+    {"input": "= 2", "output": "\033[31m[SyntaxError]\033[0m Invalid input."},
+    {"input": "funX(x = 2", "output": "\033[31m[SyntaxError]\033[0m Invalid input."},
+    {"input": "x = [[4,4];[2,2]", "output": "\033[31m[SyntaxError]\033[0m Invalid input."},
+    {"input": "x = --2", "output": "2"},
+    {"input": "3= 4", "output": "\033[31m[SyntaxError]\033[0m Invalid input."},
     {"input": "x = 22e-+dd5-+", "output": "\033[31m[NameError]\033[0m The variable e is not assigned."},
     {"input": "x = g", "output": "\033[31m[NameError]\033[0m The variable g is not assigned."},
     {"input": "x = 5 = ?", "output": "\033[31m[SyntaxError]\033[0m Invalid input."},
@@ -105,6 +110,8 @@ tests = [
     {"input": "funA(s) = 5+6-8s^2", "output": "5+6-8s^2"},
     {"input": "d = 5+3i", "output": "5 + 3i"},
     {"input": "funA(d) = ?", "output": "-117 -240i"},
+    {"input": "funA(d) = 2*d*i", "output": "2*d*i"},
+    {"input": "funA(2) = ?", "output": "4i"},
     {"input": "env", "output": ""},
 
 ]
