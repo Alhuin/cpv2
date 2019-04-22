@@ -3,8 +3,42 @@ from includes.types import Complex, Matrice, Rational
 from includes import regex, utils as u
 
 
+def findBrackets(exp):
+    bracket = 0
+    first = True
+    fun = False
+
+    for index, char in enumerate(exp):
+        if char == "(":
+            if exp[index - 4:index - 1] == "fun":
+                fun = True
+            else:
+                if first:
+                    first = False
+                    begin = index + 1
+                bracket += 1
+        elif char == ")":
+            if fun:
+                fun = False
+            else:
+                bracket -= 1
+                if bracket == 0 and not first:
+                    return exp[begin:index]
+    return None
+
+
 def parse(exp, data, i, tmp):
     match = True
+
+    # handling brackets
+    brackets = findBrackets(exp)
+    if brackets is not None:
+        ret = resolve(brackets, data)
+        key = "el" + str(i)
+        tmp[key] = ret
+        i += 1
+        exp = exp.replace("(" + brackets + ")", key, 1)
+        # print("brackets new exp = " + exp )
 
     # print("handling complexes")
     while match:                                # find and replace complexes
@@ -70,7 +104,7 @@ def parse(exp, data, i, tmp):
     while match:
         match = re.search("(?:[^a-z]|^)(?!el)([A-Z]+)", exp, flags=re.IGNORECASE)
         if match:
-            print(match)
+            # print(match)
             obj = match.group(1)
             if obj in data.keys():
                 key = "el" + str(i)
@@ -182,35 +216,36 @@ def resolve(exp, data):
     i = 0
     tmp = {}
     # print(exp)
-    # print(exp + "ici")
-    # exp = u.formatLine(exp)
     exp = re.sub("(\d+(?:\.\d+)?)([A-Z]+)", r"\1 * \2", exp, flags=re.IGNORECASE)
     # print(exp)
     if exp.strip() in data.keys():
         return data[exp.strip()]
-    if not re.search("[A-Za-z\[\]]", exp.strip()):
-        try:
-            exp = re.sub("(-?\s*\d+(?:\.\d+)?)\s*(?:\*\*|\^)\s*(\d+(?:\.\d+)?)", r"(\1)**\2", exp)
-            # print("ici?")
-            var = round(eval(exp), 2)
-            return Rational(var)
-        except ZeroDivisionError:
-            u.warn("Division by 0.", "ComputeError")
-        except SyntaxError:
-            u.warn("Invalid input", "SyntaxError")
+    # if not re.search("[A-Za-z\[\]]", exp.strip()):
+    #     try:
+    #         exp = re.sub("(-?\s*\d+(?:\.\d+)?)\s*(?:\*\*|\^)\s*(\d+(?:\.\d+)?)", r"(\1)**\2", exp)
+    #         # print("ici?")
+    #         var = round(eval(exp), 2)
+    #         return Rational(var)
+    #     except ZeroDivisionError:
+    #         u.warn("Division by 0.", "ComputeError")
+    #     except SyntaxError:
+    #         u.warn("Invalid input", "SyntaxError")
 
     parsed = parse(exp, data, i, tmp)
-
     return compute(parsed)
 
-
+#
 # def main():
-#     fn = Function("5x^2", "x")
 #     m = Matrice()
-#     data = {"x": Rational(5), "y": Rational(2.5), "funX": fn, "z": m.parse("[[5,2];[2,8]]")}
+#     data = {"x": Rational(5), "y": Rational(2.5), "z": m.parse("[[5,2];[2,8]]")}
 #     exp = "5 *5 + 3i^2"
-#     print("resolve : " + exp)
-#     resolve(exp, data).print("res")
+#     brackets = findBrackets("funX(p - g) + 5-2*(( c - d )/2)")
+#     if brackets is not None:
+#         print(brackets)
+#         # for b in brackets:
+#         #     print(b)
+#     # print("resolve : " + exp)
+#     # resolve(exp, data).print("res")
 #
 #
 # main()
