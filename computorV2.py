@@ -2,7 +2,7 @@ import sys
 import re
 import tests as t
 from resolve import resolve
-from includes import utils as u, regex
+from includes import utils as u, regex, cpv1_computor as cpv1
 from includes.customError import CustomError
 from includes.types import Function
 
@@ -40,7 +40,11 @@ def compute(line, data):
             u.warn("Can't assign the variable i.", "NameError")
         parsePut(key, exp, data)
     else:
-        u.warn("Invalid input.", "SyntaxError")
+        split = line.split('=')
+        if len(split) != 2 or len(split[0]) == 0 or len(split[1]) == 0 or "?" in split[1]\
+                or not re.search("[Xx]", line) or "fun" in line:
+            u.warn("Invalid input.", "SyntaxError")
+        cpv1.tryPolynomial(line)
 
 
 def main():
@@ -51,14 +55,7 @@ def main():
     line = ""
     while line is not None:
         try:
-            line = u.read_in()
-            if line == "env":
-                u.printEnv(data)
-                continue
-            if line == "history":
-                u.printHistory()
-                # print("hum")
-                continue
+            line = u.read_in(data)
             compute(line, data)
         except KeyboardInterrupt:
             sys.exit('')

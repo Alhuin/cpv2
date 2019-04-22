@@ -17,7 +17,7 @@ tests = [
     {"input": "x = g", "output": "\033[31m[NameError]\033[0m The variable g is not assigned."},
     {"input": "x = 5 = ?", "output": "\033[31m[SyntaxError]\033[0m Invalid input."},
     {"input": "x = 3 + 5 ?", "output": "\033[31m[SyntaxError]\033[0m Invalid input."},
-    {"input": "x + 8 = 5", "output": "\033[31m[SyntaxError]\033[0m Invalid input."},
+    {"input": "x + 8 = 5", "output": "-3"},
     {"input": "x = 10 / 0", "output": "\033[31m[ComputeError]\033[0m Division by 0."},
     {"input": "x = 5", "output": "5"},
     {"input": "x / 0 = ?", "output": "\033[31m[ComputeError]\033[0m Division by 0."},

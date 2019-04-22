@@ -10,7 +10,7 @@ func = re.compile("(fun[a-z])\((\d+|[a-z]+)\)", flags=re.IGNORECASE)
 
 evalFunc = re.compile("(fun[a-z])\(((?:[a-z]|[\d\s+\-*/%])+)\)", flags=re.IGNORECASE)
 
-draw = re.compile("draw\s*(fun[A-Z])", flags=re.IGNORECASE)
+draw = re.compile("^\s*draw\s*(fun[A-Z])\s*", flags=re.IGNORECASE)
 
 checkMatrice = re.compile("(\[\[\d+(?:\.\d+)?(?:,\d+(?:\.\d+)?)*\](?:;\[\d+(?:\.\d+)?(?:,\d+(?:\.\d+)?)*\])*\])", flags=re.IGNORECASE)
 

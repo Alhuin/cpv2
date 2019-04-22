@@ -23,7 +23,7 @@ class Function:
 
     def draw(self, xMin, xMax):
         X = np.array(range(xMin, xMax))
-        y = eval(self.function)
+        y = eval(self.formated)
         plt.plot(X, y)
         plt.show()
 
