@@ -1,22 +1,10 @@
 import re
-import readline
-
 import tests as t
 from includes import regex
 from includes.customError import CustomError
 import sys
-import click
 
 history = []
-
-
-def pgcd(a, b):
-    if b == 0:
-        return a
-    else:
-        r = a % b
-        return pgcd(b, r)
-
 
 def test():
     if t.i < len(t.tests):
@@ -36,7 +24,6 @@ def out(output):
         t.test_output(output)
     else:
         print("  " + str(output))
-
 
 
 def intFloatCast(exp):
@@ -84,12 +71,26 @@ def printHelp():
     print("\"(5 + 8) * 4^2 = ?\" or \"c + 8 = ?\" or \"funX(2) = ?\" or \"funX(c * x) + 2 = ?\"\n")
     print("- Polynomial functions :")
     print("\"x^2 + 2x - 5 = 7\" or \"x + 8 = 3\"\n")
+    print("\033[31mForbidden operations :\033[0m")
+    print("- Matrice [+-] Rational")
+    print("- Matrice [/%] Matrice")
+    print("- Matrice ^ Matrice or Complex")
+    print("- Complex % Complex")
+    print("- Complex ^ Matrice or Complex")
+    print("- Rational ^ Matrice or Complex")
+    print("- Rational [+-] Matrice")
+    print("- Rational [/%] Matrice or Complex\n")
     print("\033[33mFeatures :\033[0m")
     print("- \"env\" : Print all assigned variables so far")
     print("- \"history\" : Print all inputs so far")
     print("- \"help\" : Print help")
     print("- \"draw funX\" (if funX is defined) : Draw a graphic representation of the function")
     print("- \"q\" or \"quit\" or \"exit\" : Exit program\n")
+    print("\033[33mTODO :\033[0m")
+    print("- Matrice / Matrice")
+    print("- Complex % Complex")
+    print("- Brackets x Vars")
+
 
 
 def printEnv(data):
@@ -163,12 +164,3 @@ def formatLine(line):
     line = re.sub("(\d+)\s*\*?\s*i", r"\1 * i", line, flags=re.IGNORECASE)
     line = re.sub("\^", "**", line)
     return line
-
-
-def strInFloat(param):
-    string = str(param)
-    strLen = len(string)
-    if strLen > 2 and string[strLen - 2:strLen] == ".0":
-        return string[:strLen - 2]
-    else:
-        return string

@@ -1,6 +1,6 @@
 import re
 from includes import regex, utils as u
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt                 # used for graphical representation of functions
 import numpy as np
 import copy
 
@@ -86,7 +86,7 @@ class Rational:
         elif operation == '%':
             #TODO checker rational % matrice | complexe
             if type != "rational":
-                u.warn("Can't divide a rational by a " + type + ".", "ComputeError")
+                u.warn("Can't modulo a rational by a " + type + ".", "ComputeError")
             return Rational(round(self.value % obj.value, 2))
 
         elif operation == '^':
@@ -156,9 +156,8 @@ class Matrice:
         type = obj.getType()
 
         if operation == "+":
-            if type == "rational" or type == "complex":
+            if type == "rational":
                 u.warn("Can't add a rational to a matrice.", "ComputeError")
-
             elif type == "matrice":
                 if self.height == obj.height and self.width == obj.width:
                     for i in range(len(new)):
@@ -166,6 +165,11 @@ class Matrice:
                             new[i][j] = new[i][j].calc('+', obj.array[i][j])
                 else:
                     u.warn("Can't add matrices of different dimensions.", "ComputeError")
+            elif type == "complex":
+                for i in range(self.height):
+                    for j in range(self.width):
+                        new[i][j] = new[i][j].calc('+', obj)
+
 
         elif operation == "-":
             if type == "rational":
@@ -175,13 +179,17 @@ class Matrice:
                     for j in range(self.width):
                         new[i][j] = new[i][j].calc('-', obj)
 
-            elif type == "matrice":
+            elif type == "matrice" or type == "complex":
                 if self.height == obj.height and self.width == obj.width:
                     for i in range(len(new)):
                         for j in range(len(new[i])):
                             new[i][j] = new[i][j].calc('-', obj.array[i][j])
                 else:
                     u.warn("Can't substract matrices of different dimensions.", "ComputeError")
+            elif type == "complex":
+                for i in range(self.height):
+                    for j in range(self.width):
+                        new[i][j] = new[i][j].calc('-', obj)
 
         elif operation == "*":
             if type == "rational" or type == "complex":
