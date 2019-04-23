@@ -3,35 +3,41 @@ from includes.types import Complex, Matrice, Rational
 from includes import regex, utils as u
 
 
-def findBrackets(exp):
-    bracket = 0
-    first = True
-    fun = False
-
-    for index, char in enumerate(exp):
-        if char == "(":
-            if exp[index - 4:index - 1] == "fun":
-                fun = True
-            else:
-                if first:
-                    first = False
-                    begin = index + 1
-                bracket += 1
-        elif char == ")":
-            if fun:
-                fun = False
-            else:
-                bracket -= 1
-                if bracket == 0 and not first:
-                    return exp[begin:index]
-    return None
-
-
 def parse(exp, data, i, tmp):
+    """
+    Replace all the elements in the string by a key and stores the object in the dictionary tmp with the same key.
+
+    :param
+        exp : the expression to evaluate
+        data : the program dictionary, containing all the assigned variables so far
+        i : the index to make the key to store elements in the dictionnary (key = "el" + str(i))
+        tmp : the temporary dictinnary where we store all the parsed elements
+
+    :order
+        - find and evaluate brackets
+        - parse Complexes
+        - parse Matrices
+        - parse Variables
+        - parse negative Rationals
+        - parse positive Rationals
+
+    :return
+        obj{exp, index, tmp}:
+            exp : the formated expression
+            index : the key index, to be used by compute
+            tmp : the tmp dictionary filled with the parsed objects
+
+    :e.g.
+        parse("5 - [[1,2];[2,3]] * 5 + 3i")
+        return:
+            exp = "el0 - el1 * el2"
+            index = 3
+            tmp = {"el0": Rational(5), "el1": Matrice([[1,2];[2,3]]), "el2": Complex(5 + 3i)}
+    """
     match = True
 
     # handling brackets
-    brackets = findBrackets(exp)
+    brackets = u.findBrackets(exp)
     if brackets is not None:
         ret = resolve(brackets, data)
         key = "el" + str(i)
@@ -148,7 +154,24 @@ def parse(exp, data, i, tmp):
 
 
 def compute(parsed):
+    """
+    Replace the calculations by a key and stores the object in the tmp dictionary with the same key.
 
+    :param:
+        obj{exp, index, tmp}
+        exp : the parsed expression to evaluate
+        index : the index to make the key to store elements in the dictionnary (key = "el" + str(i))
+        tmp : the temporary dictinnary where we store all the parsed elements
+
+    :order:
+        - evaluate powers
+        - evaluate * / %
+        - evaluate + -
+
+    :return:
+        The last object in exp:
+            exp should now contain only one key as "el7" if True, then return the corresponding object from tmp
+    """
     i = parsed["index"]
     exp = parsed["exp"]
     tmp = parsed["tmp"]
@@ -220,17 +243,6 @@ def resolve(exp, data):
     # print(exp)
     if exp.strip() in data.keys():
         return data[exp.strip()]
-    # if not re.search("[A-Za-z\[\]]", exp.strip()):
-    #     try:
-    #         exp = re.sub("(-?\s*\d+(?:\.\d+)?)\s*(?:\*\*|\^)\s*(\d+(?:\.\d+)?)", r"(\1)**\2", exp)
-    #         # print("ici?")
-    #         var = round(eval(exp), 2)
-    #         return Rational(var)
-    #     except ZeroDivisionError:
-    #         u.warn("Division by 0.", "ComputeError")
-    #     except SyntaxError:
-    #         u.warn("Invalid input", "SyntaxError")
-
     parsed = parse(exp, data, i, tmp)
     return compute(parsed)
 

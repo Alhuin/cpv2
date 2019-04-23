@@ -6,6 +6,51 @@ import sys
 
 history = []
 
+
+def pgcd(a, b):
+    if b == 0:
+        return a
+    else:
+        r = a % b
+        return pgcd(b, r)
+
+
+def findBrackets(exp):
+    """
+    Search for the first brackets pair in the expression
+
+    :param
+        exp: The expression to search in
+
+    :return
+        The matched expression, or None if no brackets where found
+
+    :e.g.
+        findBrackets("5 + 2 *(3 + 8 *(5 - c))") = "3 + 8 *(5 - c)"
+    """
+    bracket = 0
+    first = True
+    fun = False
+
+    for index, char in enumerate(exp):
+        if char == "(":
+            if exp[index - 4:index - 1] == "fun":
+                fun = True
+            else:
+                if first:
+                    first = False
+                    begin = index + 1
+                bracket += 1
+        elif char == ")":
+            if fun:
+                fun = False
+            else:
+                bracket -= 1
+                if bracket == 0 and not first:
+                    return exp[begin:index]
+    return None
+
+
 def test():
     if t.i < len(t.tests):
         if t.tests[t.i]["input"] == "desc":
@@ -55,6 +100,9 @@ def warn(message, category):
 
 def printHelp():
     print("\nThis program is a \033[33mscientific calculator\033[0m. \n")
+    print("\033[32mRules :\033[0m")
+    print("- The variable 'i' can't be assigned.")
+    print("- Variable name can't contain numbers.\n")
     print("\033[32mHandled types :\033[0m")
     print("- Rationals (including natural integers) :")
     print("\"x = 5\" or \"y = 5/2\"\n")
@@ -72,24 +120,16 @@ def printHelp():
     print("- Polynomial functions :")
     print("\"x^2 + 2x - 5 = 7\" or \"x + 8 = 3\"\n")
     print("\033[31mForbidden operations :\033[0m")
-    print("- Matrice [+-] Rational")
-    print("- Matrice [/%] Matrice")
-    print("- Matrice ^ Matrice or Complex")
-    print("- Complex % Complex")
-    print("- Complex ^ Matrice or Complex")
-    print("- Rational ^ Matrice or Complex")
     print("- Rational [+-] Matrice")
-    print("- Rational [/%] Matrice or Complex\n")
+    print("- Rational / Complex")
+    print("- Anything % Matrice or Complex")
+    print("- Anything ^ Matrice or Complex\n")
     print("\033[33mFeatures :\033[0m")
     print("- \"env\" : Print all assigned variables so far")
     print("- \"history\" : Print all inputs so far")
     print("- \"help\" : Print help")
     print("- \"draw funX\" (if funX is defined) : Draw a graphic representation of the function")
     print("- \"q\" or \"quit\" or \"exit\" : Exit program\n")
-    print("\033[33mTODO :\033[0m")
-    print("- Matrice / Matrice")
-    print("- Complex % Complex")
-    print("- Brackets x Vars")
 
 
 
@@ -106,6 +146,7 @@ def printHistory():
     for input in history:
         print(input)
     print("\n")
+
 
 def read_in(data):
     global history
@@ -164,3 +205,47 @@ def formatLine(line):
     line = re.sub("(\d+)\s*\*?\s*i", r"\1 * i", line, flags=re.IGNORECASE)
     line = re.sub("\^", "**", line)
     return line
+
+
+# Handling matrice inversion
+
+
+def transposeMatrice(m, height, width):
+    return [[m[row][col] for row in range(0, height)] for col in range(0, width)]
+
+
+def getMatriceMinor(m, i, j):
+    return [row[:j] + row[j + 1:] for row in (m[:i] + m[i + 1:])]
+
+
+def getMatriceDeterminant(m):
+    if len(m) == 2:
+        return m[0][0] * m[1][1] - m[0][1] * m[1][0]
+
+    determinant = 0
+    for c in range(len(m)):
+        determinant += ((-1) ** c) * m[0][c] * getMatriceDeterminant(getMatriceMinor(m, 0, c))
+    return determinant
+
+
+def getMatriceInverse(m):
+    determinant = getMatriceDeterminant(m)
+    if determinant == 0:
+        warn("Can't compute inverse of matrice, determinant is 0.", "ComputeError")
+    if len(m) == 2:
+        return [[m[1][1] / determinant, -1 * m[0][1] / determinant],
+                [-1 * m[1][0] / determinant, m[0][0] / determinant]]
+
+    cofactors = []
+    for r in range(len(m)):
+        cofactorRow = []
+        for c in range(len(m)):
+            minor = getMatriceMinor(m, r, c)
+            cofactorRow.append(((-1) ** (r + c)) * getMatriceDeterminant(minor))
+        cofactors.append(cofactorRow)
+    cofactors = transposeMatrice(cofactors, len(cofactors), len(cofactors[0]))
+    for r in range(len(cofactors)):
+        for c in range(len(cofactors)):
+            cofactors[r][c] /= determinant
+    return cofactors
+

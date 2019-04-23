@@ -32,13 +32,14 @@ class Rational:
 
     def __init__(self, value):
         self.value = value
-        self.str = str(value)
+        self.str = str(u.intFloatCast(str(round(value, 3))))
+        self.frac = None
 
     def print(self, index):
         if index is None:
             u.out((index + " = " if index is not None else "") + self.str)
         else:
-            print("  " + (index + " = " if index is not None else "") + self.str)
+            print("  " + (index + " = " if index is not None else "") + (self.str if self.frac is None else self.frac))
 
     def getType(self):
         return "rational"
@@ -51,14 +52,14 @@ class Rational:
 
         if operation == '+':
             if type == "rational":
-                return Rational(round(self.value + obj.value, 2))
+                return Rational(self.value + obj.value)
 
             if type == "matrice" or type == "complex":
                 return obj.calc('+', self)
 
         elif operation == '-':
             if type == "rational":
-                return Rational(round(self.value - obj.value, 2))
+                return Rational(self.value - obj.value)
 
             elif type == "matrice":
                 #TODO checker real - matrice
@@ -70,29 +71,39 @@ class Rational:
 
         elif operation == '*':
             if type == "rational":
-                return Rational(round(self.value * obj.value, 2))
+                return Rational(self.value * obj.value)
 
             elif type == "matrice" or type == "complex":
                 return obj.calc('*', self)
 
         elif operation == '/':
-            #TODO checker rational / matrice | complexe
-            if type != "rational":
+            frac = None
+            if type == "complex":
                 u.warn("Can't divide a rational by a " + type + ".", "ComputeError")
+            elif type == "matrice":
+                ret = copy.deepcopy(obj)
+                ret.array = u.getMatriceInverse(ret.array)
+                return ret.calc('*', self)
             if obj.value == 0:
                 u.warn("Division by 0.", "ComputeError")
-            return Rational(round(self.value / obj.value, 2))
+            res = str(self.value / obj.value)
+            if '.' in res and '.' not in self.str and '.' not in obj.str:
+                cd = u.pgcd(self.value, obj.value)
+                frac = str(self.value / cd) + "/" + str(obj.value / cd)
+            if frac is not None:
+                self.frac = frac
+            return Rational(self.value / obj.value)
 
         elif operation == '%':
             #TODO checker rational % matrice | complexe
             if type != "rational":
                 u.warn("Can't modulo a rational by a " + type + ".", "ComputeError")
-            return Rational(round(self.value % obj.value, 2))
+            return Rational(self.value % obj.value)
 
         elif operation == '^':
             if type != "rational":
                 u.warn("Can't elevate a rational to a " + type + ".", "ComputeError")
-            return Rational(round(self.value ** obj.value, 2))
+            return Rational(self.value ** obj.value)
 
 
 class Matrice:
@@ -156,8 +167,8 @@ class Matrice:
         type = obj.getType()
 
         if operation == "+":
-            if type == "rational":
-                u.warn("Can't add a rational to a matrice.", "ComputeError")
+            if type == "rational" or type == "complex":
+                u.warn("Can't add a " + type + " to a matrice.", "ComputeError")
             elif type == "matrice":
                 if self.height == obj.height and self.width == obj.width:
                     for i in range(len(new)):
@@ -165,15 +176,10 @@ class Matrice:
                             new[i][j] = new[i][j].calc('+', obj.array[i][j])
                 else:
                     u.warn("Can't add matrices of different dimensions.", "ComputeError")
-            elif type == "complex":
-                for i in range(self.height):
-                    for j in range(self.width):
-                        new[i][j] = new[i][j].calc('+', obj)
-
 
         elif operation == "-":
-            if type == "rational":
-                u.warn("Can't substract a rational to a matrice.", "ComputeError")
+            if type == "rational" or type == "complex":
+                u.warn("Can't substract a " + type + " to a matrice.", "ComputeError")
             elif type == "complex":
                 for i in range(self.height):
                     for j in range(self.width):
@@ -186,10 +192,6 @@ class Matrice:
                             new[i][j] = new[i][j].calc('-', obj.array[i][j])
                 else:
                     u.warn("Can't substract matrices of different dimensions.", "ComputeError")
-            elif type == "complex":
-                for i in range(self.height):
-                    for j in range(self.width):
-                        new[i][j] = new[i][j].calc('-', obj)
 
         elif operation == "*":
             if type == "rational" or type == "complex":
@@ -226,16 +228,30 @@ class Matrice:
                         new[i][j] = new[i][j].calc('/', obj)
 
             elif type == "matrice":
-                u.warn("Can't divide a matrice by a matrice.", "ComputeError")
+                if obj.width != obj.height:
+                    u.warn("Can't compute the inverse of an unsquare matrice", "ComputeError")
+                new = copy.deepcopy(obj.array)
+                for i in range(obj.height):
+                    for j in range(obj.width):
+                        new[i][j] = obj.array[i][j].value
+                new = u.getMatriceInverse(new)
+                for i in range(len(new)):
+                    for j in range(len(new)):
+                        new[i][j] = Rational(new[i][j])
+                ret.array = new
+                ret.height = obj.height
+                ret.width = obj.width
+                ret = self.calc('*', ret)
+                return ret
 
         elif operation == "%":
-            if type == "rational" or type == "complex":
+            if type == "rational":
                 for i in range(self.height):
                     for j in range(self.width):
                         new[i][j] = new[i][j].calc('%', obj)
 
-            elif type == "matrice":
-                u.warn("Can't modulo a matrice by a matrice", "ComputeError")
+            else:
+                u.warn("Can't modulo a " + type + " by a matrice", "ComputeError")
 
         elif operation == '^':
             if type != "rational":
@@ -320,10 +336,7 @@ class Complex:
                 ret.imgIsNeg = ret.imaginary < 0
 
             elif type == "matrice":
-                ret = copy.deepcopy(obj)
-                for i in range(obj.height):
-                    for j in range(obj.width):
-                        ret.array[i][j] = self.calc('+', obj.array[i][j])
+                u.warn("Can't add a matrice to a complex.", "ComputeError")
 
         elif operation == "-":
             if type == "rational":
@@ -335,10 +348,7 @@ class Complex:
                 ret.imgIsNeg = ret.imaginary < 0
 
             elif type == "matrice":
-                ret = copy.deepcopy(obj)
-                for i in range(obj.height):
-                    for j in range(obj.width):
-                        ret.array[i][j] = self.calc('-', obj.array[i][j])
+                u.warn("Can't substract a matrice to a complex.", "ComputeError")
 
         elif operation == "*":
             if type == "rational":
@@ -371,9 +381,10 @@ class Complex:
 
             elif type == "matrice":
                 ret = copy.deepcopy(obj)
-                for i in range(obj.height):
-                    for j in range(obj.width):
-                        ret.array[i][j] = self.calc('*', obj.array[i][j])
+                ret.array = u.getMatriceInverse(obj.array)
+                for i in range(ret.height):
+                    for j in range(ret.width):
+                        ret.array[i][j] = self.calc('*', ret.array[i][j])
 
         elif operation == "%":
             if type == "rational":
@@ -381,15 +392,8 @@ class Complex:
                 ret.imaginary %= obj.value
                 ret.imgIsNeg = ret.imaginary < 0
 
-            elif type == "complex":
-                # TODO checker complexe % complexe
-                u.warn("Can't modulo a complex by a complex.", "todo")
-
-            elif type == "matrice":
-                ret = copy.deepcopy(obj)
-                for i in range(obj.height):
-                    for j in range(obj.width):
-                        ret.array[i][j] = self.calc('%', obj.array[i][j])
+            elif type == "complex" or type == "matrice":
+                u.warn("Can't modulo a complex by a " + type + ".", "ComputeError")
 
         elif operation == '^':
             if type != "rational":
