@@ -82,7 +82,7 @@ class Rational:
                 u.warn("Can't divide a rational by a " + type + ".", "ComputeError")
             elif type == "matrice":
                 ret = copy.deepcopy(obj)
-                ret.array = u.getMatriceInverse(ret.array)
+                ret.array = ret.getInverse(ret.array)
                 return ret.calc('*', self)
             if obj.value == 0:
                 u.warn("Division by 0.", "ComputeError")
@@ -161,6 +161,42 @@ class Matrice:
             for j in range(ret.width):
                 ret.array[i][j] = ret.array[i][j].negate()
 
+    def transpose(self, m, height, width):
+        return [[m[row][col] for row in range(0, height)] for col in range(0, width)]
+
+    def getMinor(self, m, i, j):
+        return [row[:j] + row[j + 1:] for row in (m[:i] + m[i + 1:])]
+
+    def getDeterminant(self, m):
+        if len(m) == 2:
+            return m[0][0] * m[1][1] - m[0][1] * m[1][0]
+
+        determinant = 0
+        for c in range(len(m)):
+            determinant += ((-1) ** c) * m[0][c] * self.getDeterminant(self.getMinor(0, c))
+        return determinant
+
+    def getInverse(self, m):
+        determinant = self.getDeterminant(m)
+        if determinant == 0:
+            u.warn("Can't compute inverse of matrice, determinant is 0.", "ComputeError")
+        if len(m) == 2:
+            return [[m[1][1] / determinant, -1 * m[0][1] / determinant],
+                    [-1 * m[1][0] / determinant, m[0][0] / determinant]]
+
+        cofactors = []
+        for r in range(len(m)):
+            cofactorRow = []
+            for c in range(len(m)):
+                minor = self.getMinor(m, r, c)
+                cofactorRow.append(((-1) ** (r + c)) * self.getDeterminant(minor))
+            cofactors.append(cofactorRow)
+        cofactors = self.transpose(cofactors, len(cofactors), len(cofactors[0]))
+        for r in range(len(cofactors)):
+            for c in range(len(cofactors)):
+                cofactors[r][c] /= determinant
+        return cofactors
+
     def calc(self, operation, obj):
         ret = Matrice()
         new = copy.deepcopy(self.array)
@@ -234,7 +270,7 @@ class Matrice:
                 for i in range(obj.height):
                     for j in range(obj.width):
                         new[i][j] = obj.array[i][j].value
-                new = u.getMatriceInverse(new)
+                new = self.getInverse(new)
                 for i in range(len(new)):
                     for j in range(len(new)):
                         new[i][j] = Rational(new[i][j])
@@ -381,7 +417,7 @@ class Complex:
 
             elif type == "matrice":
                 ret = copy.deepcopy(obj)
-                ret.array = u.getMatriceInverse(obj.array)
+                ret.array = ret.getInverse(obj.array)
                 for i in range(ret.height):
                     for j in range(ret.width):
                         ret.array[i][j] = self.calc('*', ret.array[i][j])
