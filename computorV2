@@ -15,7 +15,7 @@ def parsePut(key, exp, data):
     if match:
         exp = u.checkUnknownVars(exp, match.group(2).strip(), data)
         if exp is not None:
-            value = Function(exp, match.group(2))
+            value = Function(exp, match.group(2), data)
             key = match.group(1)[0:4]
         else:
             u.warn("Too many unknown variables.", "SyntaxError")

@@ -7,9 +7,13 @@ import copy
 
 class Function:
 
-    def __init__(self, function, param):
+    def __init__(self, function, param, data):
         self.function = function
-        self.formated = u.formatLine(function)
+        exp = u.checkUnknownVars(function, param, data)
+        if exp is not None:
+            self.formated = u.formatLine(exp)
+        else:
+            u.warn("Too many unknown variables.", "SyntaxError")
         self.param = param
 
     def print(self, index):
@@ -22,6 +26,13 @@ class Function:
         return "function"
 
     def draw(self, xMin, xMax):
+        matrices = re.search(regex.checkMatrice, self.formated)
+        complexes = re.search(regex.complex, self.formated)
+        zeroDiv = re.search("\/\s*0", self.formated)
+        if matrices is not None or complexes is not None:
+            u.warn("Can't draw a function with matrices or complexes.", "DrawError")
+        if zeroDiv is not None:
+            u.warn("Division by 0.", "ComputeError")
         X = np.array(range(xMin, xMax))
         y = eval(self.formated)
         plt.plot(X, y)

@@ -197,7 +197,7 @@ def checkUnknownVars(exp, param, data):
                 return None
             else:
                 exp = re.sub("(\d)" + key, r"\1 * " + key, exp, 1)
-                # exp = exp.replace(key, data[key].str)
+                exp = exp.replace(key, data[key].str)
 
     return exp
 
