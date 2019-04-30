@@ -100,6 +100,12 @@ def warn(message, category):
 
 def printHelp():
     print("\nThis program is a \033[33mscientific calculator\033[0m. \n")
+    print("\033[33mRequirements :\033[0m (brew is needed)")
+    print("- Automated installation: `./install.sh`")
+    print("- Manual Installation :")
+    print("     Install python3 `brew install python3`")
+    print("     Replace python3 path in the shebang of computorV2 line 0 : `#![which python3]`")
+    print("     Install Numpy (used for graphic rendering of functions) `pip3 install numpy`\n")
     print("\033[32mRules :\033[0m")
     print("- The variable 'i' can't be assigned.")
     print("- Variable name can't contain numbers.\n")
@@ -124,7 +130,7 @@ def printHelp():
     print("- Rational / Complex")
     print("- Anything % Matrice or Complex")
     print("- Anything ^ Matrice or Complex\n")
-    print("\033[33mFeatures :\033[0m")
+    print("\033[32mFeatures :\033[0m")
     print("- \"env\" : Print all assigned variables so far")
     print("- \"history\" : Print all inputs so far")
     print("- \"help\" : Print help")

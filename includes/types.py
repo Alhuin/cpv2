@@ -161,10 +161,12 @@ class Matrice:
             for j in range(ret.width):
                 ret.array[i][j] = ret.array[i][j].negate()
 
-    def transpose(self, m, height, width):
+    @staticmethod
+    def transpose(m, height, width):
         return [[m[row][col] for row in range(0, height)] for col in range(0, width)]
 
-    def getMinor(self, m, i, j):
+    @staticmethod
+    def getMinor(m, i, j):
         return [row[:j] + row[j + 1:] for row in (m[:i] + m[i + 1:])]
 
     def getDeterminant(self, m):

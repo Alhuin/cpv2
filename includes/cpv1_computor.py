@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import sys
 import re
 from includes import cpv1_functions as fn, utils as u
 
