@@ -26,6 +26,7 @@ def parsePut(key, exp, data):
 
 
 def compute(line, data):
+    reset = re.match(regex.reset, line)
     get = re.match(regex.get, line)
     put = re.match(regex.put, line)
     if get:
@@ -42,6 +43,14 @@ def compute(line, data):
         if key == "i":
             u.warn("Can't assign the variable i.", "NameError")
         parsePut(key, exp, data)
+    elif reset:
+        key = reset.group(1).strip()
+        if key == "all":
+            data.clear()
+        elif key in data.keys():
+            del data[key]
+        else:
+            u.warn(key + " matches no variable.\n", "NameError")
     else:
         split = line.split('=')
         if len(split) != 2 or len(split[0]) == 0 or len(split[1]) == 0 or "?" in split[1]\

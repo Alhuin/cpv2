@@ -88,6 +88,8 @@ def intFloatCast(exp):
 
 
 def warn(message, category):
+    global history
+    history[len(history) - 1] = "\033[31m" + history[len(history) - 1] + "\033[0m"
     if category == "error":
         output = ("\033[31m[Error]\033[0m " + message)
     else:
@@ -131,6 +133,7 @@ def printHelp():
     print("- Anything % Matrice or Complex")
     print("- Anything ^ Matrice or Complex\n")
     print("\033[32mFeatures :\033[0m")
+    print("- \"reset [all|varName]\" : reset the variable value (all of them if 'all' is specified)")
     print("- \"env\" : Print all assigned variables so far")
     print("- \"history\" : Print all inputs so far")
     print("- \"help\" : Print help")
@@ -141,14 +144,17 @@ def printHelp():
 
 def printEnv(data):
     t.i += 1
-    print("\n   \033[32m[ENV]\033[0m")
-    for index, var in enumerate(data):
-        data[var].print(var)
+    print("\n       \033[32m[ENV]\033[0m")
+    if not data:
+        print("No assigned variable.")
+    else:
+        for index, var in enumerate(data):
+            data[var].print(var)
     print('\n')
 
 
 def printHistory():
-    print("\n  \033[32m[HISTORY]\033[0m")
+    print("\n       \033[32m[HISTORY]\033[0m")
     for input in history:
         print(input)
     print("\n")
