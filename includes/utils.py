@@ -3,6 +3,7 @@ import tests as t
 from includes import regex
 from includes.customError import CustomError
 import sys
+import readline
 
 history = []
 
@@ -89,7 +90,9 @@ def intFloatCast(exp):
 
 def warn(message, category):
     global history
-    history[len(history) - 1] = "\033[31m" + history[len(history) - 1] + "\033[0m"
+    hlen = len(history)
+    if hlen > 0:
+        history[hlen - 1] = "\033[31m" + history[hlen - 1] + "\033[0m"
     if category == "error":
         output = ("\033[31m[Error]\033[0m " + message)
     else:
@@ -136,6 +139,8 @@ def printHelp():
     print("- \"reset [all|varName]\" : reset the variable value (all of them if 'all' is specified)")
     print("- \"env\" : Print all assigned variables so far")
     print("- \"history\" : Print all inputs so far")
+    print("- UpArrow and DownArrow = Navigate threw history.")
+    print("- LeftArrow and RightArrow = Navigate threw input.")
     print("- \"help\" : Print help")
     print("- \"draw funX\" (if funX is defined) : Draw a graphic representation of the function")
     print("- \"q\" or \"quit\" or \"exit\" : Exit program\n")
@@ -162,6 +167,7 @@ def printHistory():
 
 def read_in(data):
     global history
+    # readline.parse_and_bind('tab: complete')
     if t.test:
         line = test()
     else:
@@ -195,16 +201,17 @@ def read_in(data):
 
 def checkUnknownVars(exp, param, data):
 
-    match = re.findall(regex.checkLetter, exp)
+    # print("check")
+    match = re.findall("[^\d\Wi=]+", exp)
     for m in match:
         key = m.strip()
         if key != param:
+            # print(key)
             if key not in data.keys():
-                return None
+                warn("Too many unknown variables.", "NameError")
             else:
                 exp = re.sub("(\d)" + key, r"\1 * " + key, exp, 1)
                 exp = exp.replace(key, data[key].str)
-
     return exp
 
 
@@ -219,3 +226,17 @@ def formatLine(line):
     return line
 
 
+def checkPolynomial(line, data):
+    # print("in check")
+    split = line.split('=')
+    if len(split) != 2 or len(split[0]) == 0 or len(split[1]) == 0 or "?" in split[1] or re.search("fun[A-Za-z]", line):
+        warn("Invalid input.", "SyntaxError")
+    line = checkUnknownVars(line, "x", data)
+    print(split[0])
+    print(split[1])
+    if not re.search("[Xx]", line):
+        warn("Invalid input.", "SyntaxError")
+    if re.search("[Xx]\^\s*[^\d]", line):
+        warn("Missing power.", "SyntaxError")
+    # print("after check")
+    return line

@@ -1,9 +1,10 @@
-#!/Users/jjanin-r/.brew/bin/python3
+#!/usr/local/bin/python3
 # -*- coding: utf-8 -*-
 
 import sys
 import re
 import tests as t
+# import readline
 from resolve import resolve
 from includes import utils as u, regex, cpv1_computor as cpv1
 from includes.customError import CustomError
@@ -52,10 +53,7 @@ def compute(line, data):
         else:
             u.warn(key + " matches no variable.\n", "NameError")
     else:
-        split = line.split('=')
-        if len(split) != 2 or len(split[0]) == 0 or len(split[1]) == 0 or "?" in split[1]\
-                or not re.search("[Xx]", line) or "fun" in line:
-            u.warn("Invalid input.", "SyntaxError")
+        line = u.checkPolynomial(line, data)
         cpv1.tryPolynomial(line)
 
 

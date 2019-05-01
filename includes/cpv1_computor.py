@@ -123,5 +123,8 @@ def compute(line, elements, side):
 
 def tryPolynomial(line):
     elements = {0: None, 1: None, 2: None}
-    compute(fn.formatLine(line), elements, 0)
+    try:
+        compute(fn.formatLine(line), elements, 0)
+    except Exception:
+        u.warn("Invalid input.", "SyntaxError")
 

@@ -21,9 +21,11 @@ def strIntFloat(param):
 #   prints irreducitible fraction if necessary
 
 def printSolution(solution, den, div):
-    solution = -solution if solution == -0 else solution
+    solution = -solution if solution == -0 or solution == -0.0 else solution
     frac = ""
     res = strIntFloat(solution)
+    if res == "-0":
+        res = "0"
     if '.' in res and '.' not in strIntFloat(den) and '.' not in strIntFloat(div):
         cd = pgcd(den, div)
         frac = strIntFloat(den / cd) + "/" + strIntFloat(div / cd)
