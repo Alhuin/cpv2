@@ -59,8 +59,15 @@ def compute(line, data):
 
 def main():
     data = {}
-    if len(sys.argv) > 1 and sys.argv[1] == "-test":
-        t.test = True
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "-test":
+            t.test = True
+        elif sys.argv[1] == "-h" or sys.argv[1] == "--help":
+            u.printHelp()
+            sys.exit()
+        else:
+            print("\033[31m[IllegalOption]\033[0m Unsupported flag : " + sys.argv[1])
+            sys.exit()
 
     line = ""
     while line is not None:

@@ -106,11 +106,13 @@ def warn(message, category):
 def printHelp():
     print("\nThis program is a \033[33mscientific calculator\033[0m. \n")
     print("\033[33mRequirements :\033[0m (brew is needed)")
-    print("- Automated installation: `./install.sh`")
+    print("- Automated installation: `./configure`")
     print("- Manual Installation :")
     print("     Install python3 `brew install python3`")
     print("     Replace python3 path in the shebang of computorV2 line 0 : `#![which python3]`")
-    print("     Install Numpy (used for graphic rendering of functions) `pip3 install numpy`\n")
+    print("     Install Numpy (used for graphic rendering of functions) `[pip3 | python3 -m pip] install numpy`")
+    print("     Install Matplotlib (used for graphic rendering of functions) `[pip3 | python3 -m pip] install matplotlib`")
+    print("     Install GnuReadLine (used to navigate in the input with arrows) `[pip3 | python3 -m pip] install gnureadline`\n")
     print("\033[32mRules :\033[0m")
     print("- The variable 'i' can't be assigned.")
     print("- Variable name can't contain numbers.\n")
@@ -141,9 +143,10 @@ def printHelp():
     print("- \"history\" : Print all inputs so far")
     print("- UpArrow and DownArrow = Navigate threw history.")
     print("- LeftArrow and RightArrow = Navigate threw input.")
-    print("- \"help\" : Print help")
     print("- \"draw funX\" (if funX is defined) : Draw a graphic representation of the function")
-    print("- \"q\" or \"quit\" or \"exit\" : Exit program\n")
+    print("- \"q\" or \"quit\" or \"exit\" : Exit program")
+    print("- ./computorV2 -h or --help or \"help\" during execution : Print help")
+    print("- ./computorV2 -test : Launch automated tests\n")
 
 
 
