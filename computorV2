@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/Users/jjanin-r/.brew/bin/python3
 # -*- coding: utf-8 -*-
 
 import sys
@@ -22,6 +22,8 @@ def parsePut(key, exp, data):
             u.warn("Too many unknown variables.", "SyntaxError")
     else:
         value = resolve(exp, data)
+    if value.getType() == "function" and not re.match("fun[A-Za-z]", key):
+        u.warn("Variables containing functions must be named 'fun[A-Z]'", "NameError")
     data[key] = value
     data[key].print(None)
 
@@ -43,13 +45,17 @@ def compute(line, data):
         key = put.group(1).strip()
         if key == "i":
             u.warn("Can't assign the variable i.", "NameError")
+        if re.match("^\s*fun[A-Z]\s*$", key, flags=re.IGNORECASE):
+            u.warn("fun[A-Z] name is restricted to functions.", "NameError")
         parsePut(key, exp, data)
     elif reset:
         key = reset.group(1).strip()
         if key == "all":
             data.clear()
+            u.out("All variables have been cleared.")
         elif key in data.keys():
             del data[key]
+            u.out("The variable " + key + " has been cleared.")
         else:
             u.warn(key + " matches no variable.\n", "NameError")
     else:

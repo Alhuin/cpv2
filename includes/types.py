@@ -210,6 +210,13 @@ class Matrice:
                 cofactors[r][c] /= determinant
         return cofactors
 
+    def toIntTab(self, array):
+        ret = copy.deepcopy(array)
+        for i in range(self.height):
+            for j in range(self.width):
+                ret[i][j] = ret[i][j].value
+        return ret
+
     def calc(self, operation, obj):
         ret = Matrice()
         new = copy.deepcopy(self.array)
@@ -429,11 +436,13 @@ class Complex:
                 ret = ret.calc('/', div)
 
             elif type == "matrice":
+                if obj.array[0][0].getType() == "complex":
+                    u.warn("Can't divide a complex by a matrice of complexes (Mat[[complex]])", "ComputeError")
                 ret = copy.deepcopy(obj)
-                ret.array = ret.getInverse(obj.array)
+                ret.array = ret.getInverse(obj.toIntTab(obj.array))
                 for i in range(ret.height):
                     for j in range(ret.width):
-                        ret.array[i][j] = self.calc('*', ret.array[i][j])
+                        ret.array[i][j] = self.calc('*', Rational(ret.array[i][j]))
 
         elif operation == "%":
             if type == "rational":

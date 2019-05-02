@@ -43,6 +43,7 @@ def parse(exp, data, i, tmp):
         key = "el" + str(i)
         tmp[key] = ret
         i += 1
+        exp = re.sub("(\d+(?:\.\d+)?|[A-Za-z])\s*\(" + brackets + "\)", r"\1 * (" + brackets + ")", exp)
         exp = exp.replace("(" + brackets + ")", key, 1)
         # print("brackets new exp = " + exp )
 

@@ -38,6 +38,18 @@ def printSolution(solution, den, div):
 
 def formatLine(line):
 
+    # replace 6^2 | 6*2 | 6/2 by the result
+
+    match = True
+    while match:
+        match = re.search("(?:[+-=]|^)\s*((\d+(?:\.\d+)?)\s*[\^*/]\s*(\d+(?:\.\d+)?))\s*(?=[+-=]|$)", line, flags=re.IGNORECASE)
+        if match:
+            exp = match.group(1).replace('^', '**')
+            res = eval(exp)
+            # print(res)
+            line = line.replace(match.group(1), str(res))
+    print(line)
+
     # replace 6x^2 | 6*x^2  by 6 * X^2
 
     line = re.sub("([\+\-=]|^)\s*(\d+(?:\.\d+)?)\s*\*?\s*X\s*\^\s*(\d+)\s*(?=[\+\-=]|$)", r"\1 \2 * X^\3 ", line, flags=re.IGNORECASE)

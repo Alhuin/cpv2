@@ -21,7 +21,7 @@ echo -e '\033[32mPyhton path set in shebang\033[0m'
 
 if $pip3 list | grep -F numpy &>/dev/null ;
 then
-    echo -e '\033[32mNumpy is installed\033[0m'
+    echo -e '\033[32mNumpy is installed\033[0m (Bonus)'
 else
     echo -e '\033[33mNumpy is not installed\033[0m'
     $pip3 install numpy
@@ -29,7 +29,7 @@ fi
 
 if $pip3 list | grep -F matplotlib &>/dev/null ;
 then
-    echo -e '\033[32mMatplotlib is installed\033[0m'
+    echo -e '\033[32mMatplotlib is installed\033[0m (Bonus)'
 else
     echo -e '\033[33mMatplotlib is not installed\033[0m'
     $pip3 install matplotlib
@@ -37,11 +37,12 @@ fi
 
 if $pip3 list | grep -F gnureadline &>/dev/null ;
 then
-    echo -e '\033[32mGnuReadLine is installed\033[0m'
+    echo -e '\033[32mGnuReadLine is installed\033[0m (Bonus)'
 else
     echo -e '\033[33mGnuReadLine is not installed\033[0m'
     $pip3 install gnureadline
 fi
+
 echo ''
 echo '      +-----------------------------------+'
 echo '      | ///////////////////////////////// |'
