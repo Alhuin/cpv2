@@ -93,6 +93,10 @@ class Rational:
                 u.warn("Can't divide a rational by a " + type + ".", "ComputeError")
             elif type == "matrice":
                 ret = copy.deepcopy(obj)
+                if obj.width != obj.height:
+                    u.warn("Can't compute the inverse of an unsquare matrice", "ComputeError")
+                if obj.array[0][0].getType() == "complex":
+                    u.warn("Can't divide by a matrice of complexes (Mat[[complex]])", "ComputeError")
                 ret.array = ret.getInverse(ret.array)
                 return ret.calc('*', self)
             if obj.value == 0:
@@ -286,6 +290,8 @@ class Matrice:
             elif type == "matrice":
                 if obj.width != obj.height:
                     u.warn("Can't compute the inverse of an unsquare matrice", "ComputeError")
+                if obj.array[0][0].getType() == "complex":
+                    u.warn("Can't divide by a matrice of complexes (Mat[[complex]])", "ComputeError")
                 new = copy.deepcopy(obj.array)
                 for i in range(obj.height):
                     for j in range(obj.width):
@@ -436,8 +442,10 @@ class Complex:
                 ret = ret.calc('/', div)
 
             elif type == "matrice":
+                if obj.width != obj.height:
+                    u.warn("Can't compute the inverse of an unsquare matrice", "ComputeError")
                 if obj.array[0][0].getType() == "complex":
-                    u.warn("Can't divide a complex by a matrice of complexes (Mat[[complex]])", "ComputeError")
+                    u.warn("Can't divide by a matrice of complexes (Mat[[complex]])", "ComputeError")
                 ret = copy.deepcopy(obj)
                 ret.array = ret.getInverse(obj.toIntTab(obj.array))
                 for i in range(ret.height):
