@@ -37,15 +37,17 @@ def parse(exp, data, i, tmp):
     match = True
 
     # handling brackets
-    brackets = u.findBrackets(exp)
-    if brackets is not None:
-        ret = resolve(brackets, data)
-        key = "el" + str(i)
-        tmp[key] = ret
-        i += 1
-        exp = re.sub("(\d+(?:\.\d+)?|[A-Za-z])\s*\(" + brackets + "\)", r"\1 * (" + brackets + ")", exp)
-        exp = exp.replace("(" + brackets + ")", key, 1)
-        # print("brackets new exp = " + exp )
+    brackets = True
+    while brackets is not None:
+        brackets = u.findBrackets(exp)
+        if brackets is not None:
+            ret = resolve(brackets, data)
+            key = "el" + str(i)
+            tmp[key] = ret
+            i += 1
+            exp = re.sub("(\d+(?:\.\d+)?|[A-Za-z])\s*\(" + brackets + "\)", r"\1 * (" + brackets + ")", exp)
+            exp = exp.replace("(" + brackets + ")", key, 1)
+            # print("brackets new exp = " + exp )
 
     # print("handling complexes")
     while match:                                # find and replace complexes
