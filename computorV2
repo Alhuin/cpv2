@@ -4,7 +4,6 @@
 import sys
 import re
 import tests as t
-# import readline
 from resolve import resolve
 from includes import utils as u, regex, cpv1_computor as cpv1
 from includes.customError import CustomError

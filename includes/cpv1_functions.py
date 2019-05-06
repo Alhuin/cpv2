@@ -46,7 +46,6 @@ def formatLine(line):
         if match:
             exp = match.group(1).replace('^', '**')
             res = eval(exp)
-            # print(res)
             line = line.replace(match.group(1), str(res))
     print(line)
 

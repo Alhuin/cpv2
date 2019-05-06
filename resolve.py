@@ -36,7 +36,6 @@ def parse(exp, data, i, tmp):
     """
     match = True
 
-    # handling brackets
     brackets = True
     while brackets is not None:
         brackets = u.findBrackets(exp)
@@ -47,9 +46,7 @@ def parse(exp, data, i, tmp):
             i += 1
             exp = re.sub("(\d+(?:\.\d+)?|[A-Za-z])\s*\(" + brackets + "\)", r"\1 * (" + brackets + ")", exp)
             exp = exp.replace("(" + brackets + ")", key, 1)
-            # print("brackets new exp = " + exp )
 
-    # print("handling complexes")
     while match:                                # find and replace complexes
         match = re.search(regex.complex, exp)
         if match:
@@ -59,9 +56,7 @@ def parse(exp, data, i, tmp):
             i += 1
             exp = exp.replace(string, key, 1)
             tmp[key] = c.parse(string)
-    # print(exp)
 
-    # print("handling matrices")
     match = True
     while match:  # find and replace matrices
         match = re.search(regex.checkMatrice, exp)
@@ -72,9 +67,7 @@ def parse(exp, data, i, tmp):
             i += 1
             exp = exp.replace(string, key, 1)
             tmp[key] = m.parse(string)
-    # print(exp)
 
-    # print("handling  funcs")
     match = True
     while match:                                                # find and replace functions
         match = re.search("(fun[a-z]\(([a-z\d\s+\-/*%^]+)\))", exp, flags=re.IGNORECASE)
@@ -106,52 +99,39 @@ def parse(exp, data, i, tmp):
                         exp = exp.replace(obj, key)
             else:
                 u.warn("The function " + obj[0:4] + " is not assigned.", "NameError")
-    # print(exp)
 
-    # print("handling vars")
     match = True
     while match:
         match = re.search("(?:[^a-z]|^)(?!el)([A-Z]+)", exp, flags=re.IGNORECASE)
         if match:
-            # print(match)
             obj = match.group(1)
             if obj in data.keys():
                 key = "el" + str(i)
                 i += 1
                 tmp[key] = data[obj]
                 exp = re.sub("([^a-z]|^)(?!el)([A-Za-z]+)", r"\1" + key, exp, 1)
-                # print(exp)
             else:
                 u.warn("The variable " + obj + " is not assigned.", "NameError")
-    # print(exp)
 
-    # print("handling -ints")
     match = True
     while match:
-        # print(exp)
         match = re.search("(?:[+\-*/%]|^)\s*(-\s*\d+(?:\.\d+)?)", exp)           # find and replace negative rationals
         if match:
-            # print("matched = " + match.group(0))
             key = "el" + str(i)
             var = Rational(u.intFloatCast(match.group(1).replace(" ", "")))
             i += 1
             tmp[key] = var
             exp = re.sub("([+\-*/%]|^)\s*(-\s*\d+(?:\.\d+)?)", r"\1 " + key, exp, 1)
-    # print(exp)
 
-    # print("handling +ints")
     match = True
     while match:
-        # print(exp)
         match = re.search("(?<!el)\d+(?:\.\d+)?", exp)           # find and replace positive rationals
         if match:
-            # print("matched = " + match.group(0))
             key = "el" + str(i)
             var = Rational(u.intFloatCast(match.group(0)))
             i += 1
             tmp[key] = var
             exp = re.sub("(?<!el)\d+(?:\.\d+)?", key, exp, 1)
-    # print("END = " + exp)
 
     return {"exp": exp, "index": i, "tmp": tmp}
 
@@ -179,8 +159,6 @@ def compute(parsed):
     exp = parsed["exp"]
     tmp = parsed["tmp"]
 
-    # print("begin " + exp)
-    # print("Computing powers")
     match = True
     while match:
         match = re.search("(el\d+)\s*(?:\*\*|\^)\s*(el\d+)", exp)
@@ -192,10 +170,7 @@ def compute(parsed):
             i += 1
             tmp[key] = ret
             exp = re.sub("(el\d+)\s*(?:\*\*|\^)\s*(el\d+)", key, exp, 1)
-    # print(exp)
 
-
-    # print("Computing mult / div / mod")
     match = True
     while match:
         match = re.search("(el\d+)\s*([*/%])\s*(el\d+)", exp)
@@ -208,9 +183,7 @@ def compute(parsed):
             i += 1
             tmp[key] = ret
             exp = re.sub("(el\d+)\s*([*/%])\s*(el\d+)", key, exp, 1)
-            # print(exp)
 
-    # print("Computing add / sub")
     match = True
     while match:
         match = re.search("(el\d+)\s*([+-])\s*(el\d+)", exp)
@@ -223,12 +196,11 @@ def compute(parsed):
             i += 1
             tmp[key] = ret
             exp = re.sub("(el\d+)\s*([+-])\s*(el\d+)", key, exp, 1)
-    # print(exp)
+
     if exp.strip() in tmp.keys():
         return tmp[exp.strip()]
     else:
         match = re.match("^-\s*(el\d+)$", exp.strip())
-        # print(match)
         if match and match.group(1) in tmp.keys():
             return tmp[match.group(1)].negate()
         elif "i" in exp.strip():
@@ -241,26 +213,8 @@ def compute(parsed):
 def resolve(exp, data):
     i = 0
     tmp = {}
-    # print(exp)
     exp = re.sub("(\d+(?:\.\d+)?)([A-Z]+)", r"\1 * \2", exp, flags=re.IGNORECASE)
-    # print(exp)
     if exp.strip() in data.keys():
         return data[exp.strip()]
     parsed = parse(exp, data, i, tmp)
     return compute(parsed)
-
-#
-# def main():
-#     m = Matrice()
-#     data = {"x": Rational(5), "y": Rational(2.5), "z": m.parse("[[5,2];[2,8]]")}
-#     exp = "5 *5 + 3i^2"
-#     brackets = findBrackets("funX(p - g) + 5-2*(( c - d )/2)")
-#     if brackets is not None:
-#         print(brackets)
-#         # for b in brackets:
-#         #     print(b)
-#     # print("resolve : " + exp)
-#     # resolve(exp, data).print("res")
-#
-#
-# main()

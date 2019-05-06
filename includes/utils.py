@@ -172,7 +172,6 @@ def printHistory():
 
 def read_in(data):
     global history
-    # readline.parse_and_bind('tab: complete')
     if t.test:
         line = test()
     else:
@@ -206,12 +205,10 @@ def read_in(data):
 
 def checkUnknownVars(exp, param, data):
 
-    # print("check")
     match = re.findall("[^\d\Wi=]+", exp)
     for m in match:
         key = m.strip()
         if key != param:
-            # print(key)
             if key not in data.keys():
                 warn("Too many unknown variables.", "NameError")
             else:
@@ -232,18 +229,18 @@ def formatLine(line):
 
 
 def checkPolynomial(line, data):
-    # print("in check")
     split = line.split('=')
+
     if len(split) != 2 or len(split[0]) == 0 or len(split[1]) == 0 or "?" in split[1] or re.search("fun[A-Za-z]", line):
         warn("Invalid input.", "SyntaxError")
+
     if re.match("^\s*[A-WY-Z]+\d+(?:[A-WY-Z]+)?\s*$", split[0], flags=re.IGNORECASE):
         warn("Variable name can't contain numbers", "NameError")
     line = checkUnknownVars(line, "x", data)
-    # print(split[0])
-    # print(split[1])
+
     if not re.search("[Xx]", line):
         warn("Invalid input.", "SyntaxError")
+
     if re.search("[Xx]\^\s*[^\d]", line):
         warn("Missing power.", "SyntaxError")
-    # print("after check")
     return line
